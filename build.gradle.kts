@@ -3,19 +3,25 @@ val settings = object : TxniTemplateSettings {
 	// -------------------- Dependencies ---------------------- //
 	override val depsHandler: DependencyHandler get() = object : DependencyHandler {
 		override fun addGlobal(deps: DependencyHandlerScope) {
+			deps.implementation("com.github.ben-manes.caffeine:caffeine:3.1.2")
 
+			deps.compileOnly("org.projectlombok:lombok:1.18.34")
+			deps.annotationProcessor("org.projectlombok:lombok:1.18.34")
 		}
 
 		override fun addFabric(deps: DependencyHandlerScope) {
+			deps.modImplementation(modrinth("caxton", "0.6.0-alpha.1+1.21-FABRIC"))
 
+			deps.modImplementation(deps.include("com.github.Chocohead:Fabric-ASM:v2.3") {
+				exclude(group = "net.fabricmc", module = "fabric-loader")
+			})
 		}
 
 		override fun addForge(deps: DependencyHandlerScope) {
-
 		}
 
 		override fun addNeo(deps: DependencyHandlerScope) {
-
+			deps.modImplementation(modrinth("caxton", "0.6.0-alpha.1"))
 		}
 	}
 

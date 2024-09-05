@@ -1,4 +1,4 @@
 {
-  "example_mod.configuration.client": "client",
-  "example_mod.configuration.example": "example"
+  "immersivetooltips.configuration.client": "client",
+  "immersivetooltips.configuration.example": "example"
 }
