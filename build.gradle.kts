@@ -3,6 +3,8 @@ val settings = object : TxniTemplateSettings {
 	// -------------------- Dependencies ---------------------- //
 	override val depsHandler: DependencyHandler get() = object : DependencyHandler {
 		override fun addGlobal(deps: DependencyHandlerScope) {
+			deps.modImplementation("toni.txnilib:${loader}-${mcVersion}:1.0.1")
+
 			deps.implementation("com.github.ben-manes.caffeine:caffeine:3.1.2")
 
 			deps.compileOnly("org.projectlombok:lombok:1.18.34")
@@ -61,7 +63,7 @@ plugins {
 }
 
 // The manifold Gradle plugin version. Update this if you update your IntelliJ Plugin!
-manifold { manifoldVersion = "2024.1.30" }
+manifold { manifoldVersion = "2024.1.31" }
 
 // Variables
 class ModData {
@@ -109,6 +111,7 @@ repositories {
 	maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
 	maven("https://maven.parchmentmc.org")
 	maven("https://maven.su5ed.dev/releases")
+	maven("https://maven.txni.dev/releases")
 }
 
 dependencies {
@@ -209,13 +212,13 @@ sourceSets {
 }
 
 // Tasks
-tasks {
-	remapJar {
-		if (isNeo) {
-			atAccessWideners.add("${mod.id}.accesswidener")
-		}
-	}
-}
+//tasks {
+//	remapJar {
+//		if (isNeo) {
+//			atAccessWideners.add("${mod.id}.accesswidener")
+//		}
+//	}
+//}
 
 tasks.withType<JavaCompile>() {
 	options.compilerArgs.add("-Xplugin:Manifold")
@@ -275,6 +278,9 @@ tasks.processResources {
 	filesMatching("fabric.mod.json") { expand(map) }
 	filesMatching("META-INF/mods.toml") { expand(map) }
 	filesMatching("META-INF/neoforge.mods.toml") { expand(map) }
+	
+	if (!isFabric)
+		exclude("fabric.mod.json")
 }
 
 stonecutter {

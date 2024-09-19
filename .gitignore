@@ -15,7 +15,7 @@ wiki/node_modules/
 wiki/.vitepress/cache/
 wiki/.vitepress/dist/
 
-
+*build.properties
 
 .idea/
 *.iml

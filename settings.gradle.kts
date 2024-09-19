@@ -31,4 +31,4 @@ extensions.configure<StonecutterSettings> {
 	create(rootProject)
 }
 
-rootProject.name = "TxniTemplate"
+rootProject.name = "ImmersiveTooltips"

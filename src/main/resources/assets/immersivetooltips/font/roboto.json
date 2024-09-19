@@ -1,0 +1,35 @@
+{
+    "providers": [
+    {
+        "bold": {
+            "file": "immersivetooltips:roboto_bold.ttf",
+            "shadow_offset": 0.5
+        },
+        "type": "caxton",
+        "bold_italic": {
+            "file": "immersivetooltips:roboto_bolditalic.ttf",
+            "shadow_offset": 0.5
+        },
+        "italic": {
+            "file": "immersivetooltips:roboto_italic.ttf",
+            "shadow_offset": 0.5
+        },
+        "regular": {
+            "file": "immersivetooltips:roboto_regular.ttf",
+            "shadow_offset": 0.5
+        }
+
+    },
+    {
+        "id": "minecraft:include/space",
+        "type": "reference"
+    },
+    {
+        "id": "minecraft:include/default",
+        "type": "reference"
+    },
+    {
+        "id": "minecraft:include/unifont",
+        "type": "reference"
+    }
+]}

@@ -31,7 +31,8 @@
 	"depends": {
 		"fabricloader": ">=0.15.0",
 		"minecraft": "${mc}",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"txnilib": ">=1.0.0"
 	},
 	"accessWidener": "${id}.accesswidener"
 }
