@@ -88,13 +88,16 @@ public class OverlayRenderer {
             return;
         }
 
+        if (ImmersiveTooltipManager.hasTooltip())
+            return;
+
         if (currentTooltip == null) {
             currentTooltip = ImmersiveTooltip.builder(900f, lastBlockHitResult.getName().getString())
                     .subtext(0.5f, PlatformUtils.getModName(BuiltInRegistries.BLOCK.getKey(lastBlockHitResult).getNamespace()), 10f, subtext -> subtext
-                            .font(ImmersiveFont.NORSE)
+                            .font(ImmersiveFont.ROBOTO)
                             .italic()
                             .fadeIn(0.5f))
-                    .font(ImmersiveFont.ANTON)
+                    .font(ImmersiveFont.NORSE)
                     .bold()
                     .size(1.5F)
                     .animation(builder -> builder.transition(Binding.yPos, 0f, 0.25f, 55f + 10f, 55f, EasingType.EaseOutCubic))

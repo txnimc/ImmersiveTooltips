@@ -28,7 +28,7 @@ public class ConfigLangDatagen extends FabricLanguageProvider {
 
     @Override
     public String getName() {
-        return "ImmersiveTooltips Data Gen";
+        return "ImmersiveTooltips DataGen";
     }
 }
 #endif

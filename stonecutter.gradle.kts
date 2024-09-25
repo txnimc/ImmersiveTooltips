@@ -30,4 +30,6 @@ stonecutter registerChiseled tasks.register("chiseledPublishMaven", stonecutter.
     ofTask("publish")
 }
 
+stonecutter.exclude("*.ttf")
+stonecutter.exclude("*.otf")
 stonecutter.automaticPlatformConstants = true

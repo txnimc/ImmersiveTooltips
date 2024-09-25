@@ -3,7 +3,7 @@ val settings = object : TxniTemplateSettings {
 	// -------------------- Dependencies ---------------------- //
 	override val depsHandler: DependencyHandler get() = object : DependencyHandler {
 		override fun addGlobal(deps: DependencyHandlerScope) {
-			deps.modImplementation("toni.txnilib:${loader}-${mcVersion}:1.0.1")
+			deps.modImplementation("toni.txnilib:${loader}-${mcVersion}:1.0.4")
 
 			deps.implementation("com.github.ben-manes.caffeine:caffeine:3.1.2")
 
@@ -337,7 +337,19 @@ publishing {
 			version = mod.version
 			artifactId = "$loader-$mcVersion" //base.archivesName.get()
 
-			from(components["java"])
+			artifact(tasks.remapJar)
+			artifact(tasks.remapSourcesJar) { classifier = "sources" }
+			pom {
+				name.set(mod.displayName)
+				licenses {
+					license {
+						name.set(mod.license)
+					}
+				}
+				developers {
+					developer { name.set(mod.author) }
+				}
+			}
 		}
 	}
 

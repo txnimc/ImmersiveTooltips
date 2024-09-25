@@ -1,17 +1,23 @@
 package toni.immersivetooltips;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
 import net.fabricmc.fabric.api.event.client.player.ClientPlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import toni.immersivetooltips.foundation.ImmersiveFont;
 import toni.immersivetooltips.foundation.ImmersiveTooltip;
 import toni.immersivetooltips.foundation.ObfuscateMode;
 import toni.immersivetooltips.foundation.config.AllConfigs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import toni.immersivetooltips.foundation.networking.TooltipPacket;
 import toni.immersivetooltips.foundation.overlay.OverlayRenderer;
 import toni.lib.animation.AnimationTimeline;
 
@@ -95,6 +101,8 @@ public class ImmersiveTooltips #if FABRIC implements ModInitializer, ClientModIn
 
     #if FABRIC @Override #endif
     public void onInitialize() {
+        TooltipPacket.register();
+
         #if FABRIC
             AllConfigs.register((type, spec) -> {
                 #if AFTER_21_1
@@ -108,6 +116,8 @@ public class ImmersiveTooltips #if FABRIC implements ModInitializer, ClientModIn
 
     #if FABRIC @Override #endif
     public void onInitializeClient() {
+        TooltipPacket.registerClient();
+
         #if AFTER_21_1
             #if FABRIC
             ConfigScreenFactoryRegistry.INSTANCE.register(ImmersiveTooltips.ID, ConfigurationScreen::new);
@@ -120,24 +130,6 @@ public class ImmersiveTooltips #if FABRIC implements ModInitializer, ClientModIn
         HudRenderCallback.EVENT.register((stack, delta) -> {
             Window window = Minecraft.getInstance().getWindow();
             OverlayRenderer.renderOverlay(stack, delta, window);
-        });
-
-        ClientPlayerBlockBreakEvents.AFTER.register((world, player, pos, state) -> {
-
-            ImmersiveTooltip.builder(10f, "The wind howls, the night draws near.")
-                    .subtext(2f, "Seek shelter, build a campfire.", subtext -> subtext
-                            .font(ImmersiveFont.ROBOTO)
-                            .italic()
-                            .fadeIn(3f)
-                            .fadeOut())
-                    .font(ImmersiveFont.NORSE)
-                    .bold()
-                    .obfuscate(ObfuscateMode.RANDOM, 1f)
-                    .slideUp()
-                    .fadeIn(3f)
-                    .fadeOut()
-                    .size(1.5f)
-                    .send(player);
         });
         #endif
     }

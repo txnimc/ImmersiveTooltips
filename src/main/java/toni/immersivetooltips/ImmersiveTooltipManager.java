@@ -5,6 +5,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import toni.immersivetooltips.foundation.ImmersiveTooltip;
+import toni.immersivetooltips.foundation.config.AllConfigs;
 import toni.immersivetooltips.foundation.renderers.CaxtonRenderer;
 import toni.immersivetooltips.foundation.renderers.ITooltipRenderer;
 import toni.immersivetooltips.foundation.renderers.VanillaRenderer;
@@ -43,7 +44,7 @@ public class ImmersiveTooltipManager {
         if (depth == 0 && tooltip.animation.getCurrent() >= tooltip.animation.duration)
         {
             currentTooltip = null;
-            countdownToNextTooltip = 20f;
+            countdownToNextTooltip = 20f * AllConfigs.client().timeBetweenTooltips.get();
             return;
         }
 
@@ -63,5 +64,13 @@ public class ImmersiveTooltipManager {
 
     static void showToPlayer(LocalPlayer player, ImmersiveTooltip tooltip) {
         tooltipQueue.add(tooltip);
+    }
+
+    public static boolean hasTooltip() {
+        return currentTooltip != null;
+    }
+
+    public static int queueCount() {
+        return tooltipQueue.size();
     }
 }
