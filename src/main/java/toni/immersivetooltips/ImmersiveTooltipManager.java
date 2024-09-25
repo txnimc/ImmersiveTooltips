@@ -1,7 +1,8 @@
 package toni.immersivetooltips;
 
 import lombok.Getter;
-import net.minecraft.client.DeltaTracker;
+#if MC > "201" import net.minecraft.client.DeltaTracker; #endif
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import toni.immersivetooltips.foundation.ImmersiveTooltip;
@@ -19,11 +20,28 @@ public class ImmersiveTooltipManager {
     @Getter
     private static final ITooltipRenderer renderer = initRenderer();
 
+    private static final float NANOSECONDS_PER_TICK = 1000000000.0f / 20; // 50 million ns per tick for 20 ticks per second
+    private static long lastTime = System.nanoTime();
+
     private static ImmersiveTooltip currentTooltip;
     private static double countdownToNextTooltip = 0f;
 
-    static void render(GuiGraphics graphics, DeltaTracker delta) {
-        countdownToNextTooltip -= delta.getGameTimeDeltaTicks();
+    static void render(GuiGraphics graphics, #if MC == "201" float #else DeltaTracker #endif delta) {
+        long currentTime = System.nanoTime();
+        if (Minecraft.getInstance().isPaused())
+        {
+            lastTime = currentTime;
+            return;
+        }
+
+        #if MC == "201"
+        var partialTicks = (currentTime - lastTime) / NANOSECONDS_PER_TICK;
+        lastTime = currentTime;
+        #else
+        var partialTicks = delta.getRealtimeDeltaTicks();
+        #endif
+
+        countdownToNextTooltip -= partialTicks;
         if (currentTooltip == null) {
             if (tooltipQueue.isEmpty())
                 return;
@@ -34,12 +52,12 @@ public class ImmersiveTooltipManager {
         if (countdownToNextTooltip > 0)
             return;
 
-        renderTooltip(graphics, delta, currentTooltip, 0);
+        renderTooltip(graphics, partialTicks, currentTooltip, 0);
     }
 
-    static void renderTooltip(GuiGraphics graphics, DeltaTracker delta, ImmersiveTooltip tooltip, int depth) {
-        tooltip.tickObfuscation(delta.getRealtimeDeltaTicks());
-        tooltip.animation.advancePlayhead(delta.getRealtimeDeltaTicks() / 20);
+    static void renderTooltip(GuiGraphics graphics, float deltaTicks, ImmersiveTooltip tooltip, int depth) {
+        tooltip.tickObfuscation(deltaTicks);
+        tooltip.animation.advancePlayhead(deltaTicks / 20);
 
         if (depth == 0 && tooltip.animation.getCurrent() >= tooltip.animation.duration)
         {
@@ -51,7 +69,7 @@ public class ImmersiveTooltipManager {
         renderer.render(tooltip, graphics);
 
         if (tooltip.subtext != null)
-            renderTooltip(graphics, delta, tooltip.subtext, depth + 1);
+            renderTooltip(graphics, deltaTicks, tooltip.subtext, depth + 1);
     }
 
 

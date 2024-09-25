@@ -1,9 +1,7 @@
 package toni.immersivetooltips.foundation.overlay;
 
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.FastColor;
@@ -44,10 +42,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+#if MC > "201" import net.minecraft.client.DeltaTracker; #endif
 
 public class OverlayRenderer {
 
     //private static final Map<Object, OutlineEntry> outlines = CreateClient.OUTLINER.getOutlines();
+    private static final float NANOSECONDS_PER_TICK = 1000000000.0f / 20; // 50 million ns per tick for 20 ticks per second
+    private static long lastTime = System.nanoTime();
 
     private static final ImmersiveColor theme = new ImmersiveColor(0xf0_100010, true);
 
@@ -56,8 +57,18 @@ public class OverlayRenderer {
 
     private static Block lastBlockHitResult;
 
-    public static void renderOverlay(GuiGraphics graphics, DeltaTracker delta, Window window) {
+    public static void renderOverlay(GuiGraphics graphics, #if MC == "201" float #else DeltaTracker #endif delta, Window window) {
+        if (Minecraft.getInstance().isPaused())
+            return;
+
+        #if MC == "201"
+        long currentTime = System.nanoTime();
+        var partialTicks = (currentTime - lastTime) / NANOSECONDS_PER_TICK;
+        lastTime = currentTime;
+        #else
         var partialTicks = delta.getRealtimeDeltaTicks();
+        #endif
+
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
@@ -205,7 +216,7 @@ public class OverlayRenderer {
         graphics.fillGradient(xMaxL, height + 6, xMinR, yMinB, borderColorEnd, borderColorEnd);
 
 
-        MultiBufferSource.BufferSource renderType = MultiBufferSource.immediate(new ByteBufferBuilder(512));
+        MultiBufferSource.BufferSource renderType = MultiBufferSource.immediate(#if MC > "201" new ByteBufferBuilder(512) #else new BufferBuilder(512) #endif);
         graphics.pose().translate(0.0D, 0.0D, 1);
 
         int yOffset = 0;

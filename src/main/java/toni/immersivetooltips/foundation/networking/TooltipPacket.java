@@ -1,15 +1,16 @@
 package toni.immersivetooltips.foundation.networking;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import org.joml.Vector3f;
-import toni.immersivetooltips.ImmersiveTooltipManager;
 import toni.immersivetooltips.ImmersiveTooltips;
 import toni.immersivetooltips.foundation.ImmersiveTooltip;
 import toni.lib.networking.ToniPacket;
+
+#if MC > "201"
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+#else
+import toni.lib.networking.codecs.StreamCodec;
+#endif
 
 public class TooltipPacket extends ToniPacket<TooltipPacket> {
 

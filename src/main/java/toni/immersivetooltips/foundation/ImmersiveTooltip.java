@@ -6,7 +6,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,8 +15,17 @@ import toni.immersivetooltips.foundation.networking.TooltipPacket;
 import toni.lib.animation.AnimationTimeline;
 import toni.lib.animation.Binding;
 import toni.lib.animation.easing.EasingType;
+import toni.lib.utils.VersionUtils;
+
+#if MC > "201"
+import net.minecraft.network.codec.StreamCodec;
+#else
+import toni.lib.networking.codecs.StreamCodec;
+#endif
+
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -43,7 +51,7 @@ public class ImmersiveTooltip {
     private ImmersiveTooltip() { }
 
 
-    public static final StreamCodec<ByteBuf, ImmersiveTooltip> CODEC = new StreamCodec<>() /* ByteBufCodecs$16 */ {
+    public static final StreamCodec<ByteBuf, ImmersiveTooltip> CODEC = new StreamCodec<>() {
         public ImmersiveTooltip decode(ByteBuf byteBuf) {
             return ImmersiveTooltip.decode(byteBuf);
         }
@@ -56,7 +64,12 @@ public class ImmersiveTooltip {
     private void encode(ByteBuf buffer) {
         var buf = new FriendlyByteBuf(buffer);
 
+        #if MC > "201"
         buf.writeJsonWithCodec(Style.Serializer.CODEC, style);
+        #else
+        buf.writeJsonWithCodec(Style.FORMATTING_CODEC, style);
+        #endif
+
         buf.writeUtf(text);
         animation.encode(buf);
 
@@ -83,7 +96,12 @@ public class ImmersiveTooltip {
         var buf = new FriendlyByteBuf(buffer);
         var ths = new ImmersiveTooltip();
 
+        #if MC > "201"
         ths.style = buf.readJsonWithCodec(Style.Serializer.CODEC);
+        #else
+        ths.style = buf.readJsonWithCodec(Style.FORMATTING_CODEC);
+        #endif
+
         ths.text = buf.readUtf();
         ths.animation = AnimationTimeline.decode(buf);
 
@@ -277,7 +295,7 @@ public class ImmersiveTooltip {
      * @return the tooltip builder
      */
     public ImmersiveTooltip font(String font) {
-        this.style = style.withFont(ResourceLocation.parse(font));
+        this.style = style.withFont(VersionUtils.resource(font));
         return this;
     }
 
@@ -333,6 +351,11 @@ public class ImmersiveTooltip {
 
     public void sendServer(ServerPlayer player) {
         new TooltipPacket(this).send(player);
+    }
+
+
+    public void sendServer(Collection<ServerPlayer> players) {
+        players.forEach(this::sendServer);
     }
 
     public void sendServerToAll(MinecraftServer server) {
@@ -453,4 +476,5 @@ public class ImmersiveTooltip {
         }
         return closestIndex;
     }
+
 }

@@ -3,28 +3,42 @@ val settings = object : TxniTemplateSettings {
 	// -------------------- Dependencies ---------------------- //
 	override val depsHandler: DependencyHandler get() = object : DependencyHandler {
 		override fun addGlobal(deps: DependencyHandlerScope) {
-			deps.modImplementation("toni.txnilib:${mod.loader}-${mod.mcVersion}:1.0.4")
+			deps.modImplementation("toni.txnilib:${mod.loader}-${mod.mcVersion}:1.0.18")
 
-			deps.implementation("com.github.ben-manes.caffeine:caffeine:3.1.2")
+			deps.modImplementation("com.github.ben-manes.caffeine:caffeine:3.1.2")
 
 			deps.compileOnly("org.projectlombok:lombok:1.18.34")
 			deps.annotationProcessor("org.projectlombok:lombok:1.18.34")
 		}
 
 		override fun addFabric(deps: DependencyHandlerScope) {
-			deps.modImplementation(modrinth("caxton", "0.6.0-alpha.1+1.21-FABRIC"))
 
-			deps.modImplementation(deps.include("com.github.Chocohead:Fabric-ASM:v2.3") {
-				exclude(group = "net.fabricmc", module = "fabric-loader")
-			})
+			if (mod.mcVersion == "1.21.1") {
+				deps.modImplementation(modrinth("caxton", "0.6.0-alpha.2+1.21.1-FABRIC"))
+				deps.modImplementation(deps.include("com.github.Chocohead:Fabric-ASM:v2.3") {
+					exclude(group = "net.fabricmc", module = "fabric-loader")
+				})
+			}
+			else {
+				deps.modImplementation(modrinth("caxton", "0.6.0-alpha.2.1+1.20.1-FABRIC"))
+				deps.include(deps.implementation(deps.annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.4.1")!!)!!)
+				deps.modImplementation(deps.include("com.github.Chocohead:Fabric-ASM:v2.3") {
+					exclude(group = "net.fabricmc", module = "fabric-loader")
+				})
+			}
 		}
 
 		override fun addForge(deps: DependencyHandlerScope) {
+			deps.modImplementation(modrinth("caxton", "0.6.0-alpha.2.1+1.20.1-FORGE"))
+			deps.minecraftRuntimeLibraries("com.github.ben-manes.caffeine:caffeine:3.1.2")
 
+			deps.compileOnly(deps.annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
+			deps.implementation(deps.include("io.github.llamalad7:mixinextras-forge:0.4.1")!!)
 		}
 
 		override fun addNeo(deps: DependencyHandlerScope) {
-			deps.modImplementation(modrinth("caxton", "0.6.0-alpha.1"))
+			deps.modImplementation(modrinth("caxton", "0.6.0-alpha.2+1.21.1-NEOFORGE"))
+			deps.minecraftRuntimeLibraries("com.github.ben-manes.caffeine:caffeine:3.1.2")
 		}
 	}
 
@@ -123,7 +137,7 @@ dependencies {
 
 		if (setting("runtime.sodium"))
 			modRuntimeOnly(settings.depsHandler.modrinth("sodium", when (mod.mcVersion) {
-				"1.21.1" -> "mc1.21-0.6.0-beta.1-fabric"
+				"1.21.1" -> "mc1.21-0.6.0-beta.2-fabric"
 				"1.20.1" -> "mc1.20.1-0.5.11"
 				else -> null
 			}))
@@ -139,7 +153,7 @@ dependencies {
 		"neoForge"("net.neoforged:neoforge:${property("deps.fml")}")
 
 		if (setting("runtime.sodium"))
-			runtimeOnly(settings.depsHandler.modrinth("sodium", "mc1.21-0.6.0-beta.1-neoforge"))
+			runtimeOnly(settings.depsHandler.modrinth("sodium", "mc1.21-0.6.0-beta.2-neoforge"))
 	}
 
 	vineflowerDecompilerClasspath("org.vineflower:vineflower:1.10.1")
@@ -160,6 +174,9 @@ loom {
 
 	if (mod.isActive) {
 		runConfigs.all {
+			dependencies {
+				runtimeOnly("com.github.ben-manes.caffeine:caffeine:3.1.2")
+			}
 			ideConfigGenerated(true)
 			vmArgs("-Dmixin.debug.export=true", "-Dsodium.checks.issue2561=false")
 			// Mom look I'm in the codebase!
@@ -194,6 +211,14 @@ sourceSets {
 			exclude(".cache/")
 		}
 	}
+}
+
+tasks.withType<Tar>() {
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+tasks.withType<Zip>() {
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 // Tasks

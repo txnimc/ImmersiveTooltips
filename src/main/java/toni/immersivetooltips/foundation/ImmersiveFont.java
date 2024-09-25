@@ -2,6 +2,7 @@ package toni.immersivetooltips.foundation;
 
 import net.minecraft.resources.ResourceLocation;
 import toni.lib.utils.PlatformUtils;
+import toni.lib.utils.VersionUtils;
 
 public enum ImmersiveFont {
     KALAM("kalam"),
@@ -18,8 +19,8 @@ public enum ImmersiveFont {
 
     public ResourceLocation getLocation() {
         if (!PlatformUtils.isModLoaded("caxton"))
-            return ResourceLocation.fromNamespaceAndPath("minecraft", "font/default");
+            return VersionUtils.resource("minecraft", "font/default");
 
-        return ResourceLocation.fromNamespaceAndPath("immersivetooltips", font);
+        return VersionUtils.resource("immersivetooltips", font);
     }
 }

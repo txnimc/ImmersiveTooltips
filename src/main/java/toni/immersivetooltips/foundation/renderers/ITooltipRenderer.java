@@ -1,6 +1,5 @@
 package toni.immersivetooltips.foundation.renderers;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import toni.immersivetooltips.foundation.ImmersiveTooltip;
 

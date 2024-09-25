@@ -1,13 +1,19 @@
 package toni.immersivetooltips;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
-import net.fabricmc.fabric.api.event.client.player.ClientPlayerBlockBreakEvents;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.arguments.CompoundTagArgument;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.NbtTagArgument;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -21,17 +27,21 @@ import toni.immersivetooltips.foundation.networking.TooltipPacket;
 import toni.immersivetooltips.foundation.overlay.OverlayRenderer;
 import toni.lib.animation.AnimationTimeline;
 
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+
+import static net.minecraft.commands.Commands.*;
 
 #if FABRIC
     import net.fabricmc.api.ClientModInitializer;
     import net.fabricmc.api.ModInitializer;
-    import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+
     #if after_21_1
     import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
     import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
     import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import toni.lib.animation.Binding;
-import toni.lib.animation.easing.EasingType;
+    import toni.lib.animation.Binding;
+    import toni.lib.animation.easing.EasingType;
     #endif
 
     #if current_20_1
@@ -112,6 +122,77 @@ public class ImmersiveTooltips #if FABRIC implements ModInitializer, ClientModIn
                 #endif
             });
         #endif
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("immersivetooltips")
+            .requires(source -> source.hasPermission(2))
+            .then(literal("send")
+                .then(argument("player", EntityArgument.players())
+                    .then(argument("duration", FloatArgumentType.floatArg())
+                        .then(argument("string", StringArgumentType.greedyString())
+                            .executes(context -> {
+                                var players = EntityArgument.getPlayers(context, "player");
+                                var duration = FloatArgumentType.getFloat(context, "duration");
+                                var string = StringArgumentType.getString(context, "string");
+
+                                ImmersiveTooltip.builder(duration, string)
+                                    .slideUp()
+                                    .fadeIn()
+                                    .fadeOut()
+                                    .sendServer(players);
+
+                                return 1;
+                            })
+                        )
+                    )
+                )
+            )
+            .then(literal("sendcustom")
+                .then(argument("player", EntityArgument.players())
+                    .then(argument("data", CompoundTagArgument.compoundTag())
+                        .then(argument("duration", FloatArgumentType.floatArg())
+                            .then(argument("string", StringArgumentType.greedyString())
+                                .executes(context -> {
+                                    var players = EntityArgument.getPlayers(context, "player");
+                                    var duration = FloatArgumentType.getFloat(context, "duration");
+                                    var data = CompoundTagArgument.getCompoundTag(context, "data");
+                                    var string = StringArgumentType.getString(context, "string");
+
+                                    var tooltip = ImmersiveTooltip.builder(duration, string);
+
+                                    if (data.contains("slideup")) tooltip.slideUp();
+                                    else if (data.contains("slidedown")) tooltip.slideDown();
+                                    else if (data.contains("slideleft")) tooltip.slideLeft();
+                                    else if (data.contains("slideright")) tooltip.slideRight();
+                                    else {
+                                        tooltip.slideUp();
+                                    }
+
+                                    if (data.contains("fadein")) tooltip.fadeIn(data.getFloat("fadein"));
+                                    else if (data.contains("fadeout")) tooltip.fadeOut(data.getFloat("fadeout"));
+                                    else {
+                                        tooltip.fadeIn().fadeOut();
+                                    }
+
+                                    if (data.contains("bold")) tooltip.bold();
+                                    if (data.contains("italic")) tooltip.italic();
+                                    if (data.contains("shake")) tooltip.shake();
+                                    if (data.contains("wave")) tooltip.wave();
+                                    if (data.contains("obfuscate")) tooltip.obfuscate();
+                                    if (data.contains("color")) tooltip.color(TextColor.parseColor(data.getString("color")));
+                                    if (data.contains("size")) tooltip.size(data.getFloat("size"));
+                                    if (data.contains("y")) tooltip.y(data.getFloat("y"));
+                                    if (data.contains("x")) tooltip.x(data.getFloat("x"));
+                                    if (data.contains("font")) tooltip.font(data.getString("font"));
+
+                                    tooltip.sendServer(players);
+                                    return 1;
+                                })
+                            )
+                        )
+                    )
+                )
+            )
+        ));
     }
 
     #if FABRIC @Override #endif
@@ -124,14 +205,12 @@ public class ImmersiveTooltips #if FABRIC implements ModInitializer, ClientModIn
             #endif
         #endif
 
-        #if FABRIC
         HudRenderCallback.EVENT.register(ImmersiveTooltipManager::render);
 
         HudRenderCallback.EVENT.register((stack, delta) -> {
             Window window = Minecraft.getInstance().getWindow();
             OverlayRenderer.renderOverlay(stack, delta, window);
         });
-        #endif
     }
 
     // Forg event stubs to call the Fabric initialize methods, and set up cloth config screen
