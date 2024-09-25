@@ -89,6 +89,7 @@ repositories {
 	maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
 	maven("https://maven.parchmentmc.org")
 	maven("https://maven.su5ed.dev/releases")
+	maven("https://maven.txni.dev/releases")
 }
 
 dependencies {
