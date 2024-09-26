@@ -1,4 +1,4 @@
-package toni.immersivemessages.foundation;
+package toni.immersivemessages.api;
 
 public enum ObfuscateMode {
     NONE,

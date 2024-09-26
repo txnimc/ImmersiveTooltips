@@ -1,8 +1,8 @@
-package toni.immersivemessages.foundation.renderers;
+package toni.immersivemessages.renderers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import toni.immersivemessages.foundation.ImmersiveMessage;
+import toni.immersivemessages.api.ImmersiveMessage;
 
 public class VanillaRenderer implements ITooltipRenderer {
     @Override

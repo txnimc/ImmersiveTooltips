@@ -1,4 +1,4 @@
-package toni.immersivemessages.foundation.overlay;
+package toni.immersivemessages.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -17,9 +17,9 @@ import net.minecraft.world.level.GameType;
 import com.mojang.blaze3d.platform.Window;
 import org.joml.Vector3i;
 import toni.immersivemessages.ImmersiveMessagesManager;
-import toni.immersivemessages.foundation.ImmersiveFont;
-import toni.immersivemessages.foundation.ImmersiveMessage;
-import toni.immersivemessages.foundation.util.ImmersiveColor;
+import toni.immersivemessages.ImmersiveFont;
+import toni.immersivemessages.api.ImmersiveMessage;
+import toni.immersivemessages.util.ImmersiveColor;
 import toni.lib.animation.Binding;
 import toni.lib.animation.easing.EasingType;
 import toni.lib.utils.PlatformUtils;

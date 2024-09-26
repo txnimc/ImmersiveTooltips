@@ -1,12 +1,11 @@
 package toni.immersivemessages;
 
 import net.minecraft.client.player.LocalPlayer;
-import toni.immersivemessages.foundation.ImmersiveMessagesCommands;
-import toni.immersivemessages.foundation.ImmersiveMessage;
-import toni.immersivemessages.foundation.config.AllConfigs;
+import toni.immersivemessages.api.ImmersiveMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import toni.immersivemessages.foundation.networking.TooltipPacket;
+import toni.immersivemessages.config.AllConfigs;
+import toni.immersivemessages.networking.TooltipPacket;
 import toni.lib.animation.AnimationTimeline;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;

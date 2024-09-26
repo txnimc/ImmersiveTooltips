@@ -1,4 +1,4 @@
-package toni.immersivemessages.foundation.util;
+package toni.immersivemessages.util;
 
 import com.google.common.hash.Hashing;
 

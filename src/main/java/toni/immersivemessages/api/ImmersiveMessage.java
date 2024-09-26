@@ -1,4 +1,4 @@
-package toni.immersivemessages.foundation;
+package toni.immersivemessages.api;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
@@ -10,7 +10,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 import toni.immersivemessages.ImmersiveMessages;
-import toni.immersivemessages.foundation.networking.TooltipPacket;
+import toni.immersivemessages.ImmersiveFont;
+import toni.immersivemessages.networking.TooltipPacket;
 import toni.lib.animation.AnimationTimeline;
 import toni.lib.animation.Binding;
 import toni.lib.animation.easing.EasingType;

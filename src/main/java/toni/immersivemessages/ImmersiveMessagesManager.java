@@ -5,11 +5,11 @@ import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import toni.immersivemessages.foundation.ImmersiveMessage;
-import toni.immersivemessages.foundation.config.AllConfigs;
-import toni.immersivemessages.foundation.renderers.CaxtonRenderer;
-import toni.immersivemessages.foundation.renderers.ITooltipRenderer;
-import toni.immersivemessages.foundation.renderers.VanillaRenderer;
+import toni.immersivemessages.api.ImmersiveMessage;
+import toni.immersivemessages.config.AllConfigs;
+import toni.immersivemessages.renderers.CaxtonRenderer;
+import toni.immersivemessages.renderers.ITooltipRenderer;
+import toni.immersivemessages.renderers.VanillaRenderer;
 import toni.lib.utils.PlatformUtils;
 
 import java.util.LinkedList;

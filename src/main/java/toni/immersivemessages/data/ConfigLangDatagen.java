@@ -1,11 +1,10 @@
-package toni.immersivemessages.foundation.data;
+package toni.immersivemessages.data;
 
 #if FABRIC
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
-import toni.immersivemessages.ImmersiveMessages;
-import toni.immersivemessages.foundation.config.AllConfigs;
+import toni.immersivemessages.config.AllConfigs;
 
 import java.util.concurrent.CompletableFuture;
 

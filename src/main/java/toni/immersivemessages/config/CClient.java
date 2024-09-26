@@ -1,4 +1,4 @@
-package toni.immersivemessages.foundation.config;
+package toni.immersivemessages.config;
 
 import toni.lib.config.ConfigBase;
 

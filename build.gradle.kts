@@ -14,7 +14,7 @@ val settings = object : TxniTemplateSettings {
 		override fun addFabric(deps: DependencyHandlerScope) {
 
 			if (mod.mcVersion == "1.21.1") {
-				deps.modCompileOnly(modrinth("caxton", "0.6.0-alpha.2+1.21.1-FABRIC"))
+				deps.modImplementation(modrinth("caxton", "0.6.0-alpha.2+1.21.1-FABRIC"))
 				deps.modImplementation(deps.include("com.github.Chocohead:Fabric-ASM:v2.3") {
 					exclude(group = "net.fabricmc", module = "fabric-loader")
 				})
@@ -47,6 +47,7 @@ val settings = object : TxniTemplateSettings {
 	// For configuring the dependecies that will show up on your mod page.
 	override val publishHandler: PublishDependencyHandler get() = object : PublishDependencyHandler {
 		override fun addShared(deps: DependencyContainer) {
+			deps.requires("txnilib")
 			if (mod.isFabric) {
 				deps.requires("fabric-api")
 			}

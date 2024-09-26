@@ -1,4 +1,4 @@
-package toni.immersivemessages.foundation.data;
+package toni.immersivemessages.data;
 
 #if FABRIC
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;

@@ -1,4 +1,4 @@
-package toni.immersivemessages.foundation;
+package toni.immersivemessages;
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.TextColor;
+import toni.immersivemessages.api.ImmersiveMessage;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;

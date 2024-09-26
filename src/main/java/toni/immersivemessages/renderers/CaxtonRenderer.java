@@ -1,7 +1,7 @@
-package toni.immersivemessages.foundation.renderers;
+package toni.immersivemessages.renderers;
 
 import net.minecraft.client.gui.GuiGraphics;
-import toni.immersivemessages.foundation.ImmersiveMessage;
+import toni.immersivemessages.api.ImmersiveMessage;
 import xyz.flirora.caxton.layout.CaxtonText;
 import xyz.flirora.caxton.render.CaxtonTextRenderer;
 

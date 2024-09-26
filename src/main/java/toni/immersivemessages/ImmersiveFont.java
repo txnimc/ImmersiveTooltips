@@ -1,4 +1,4 @@
-package toni.immersivemessages.foundation;
+package toni.immersivemessages;
 
 import net.minecraft.resources.ResourceLocation;
 import toni.lib.utils.PlatformUtils;

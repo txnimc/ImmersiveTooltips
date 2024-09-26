@@ -1,12 +1,11 @@
-package toni.immersivemessages.foundation.networking;
+package toni.immersivemessages.networking;
 
 import net.minecraft.client.Minecraft;
 import toni.immersivemessages.ImmersiveMessages;
-import toni.immersivemessages.foundation.ImmersiveMessage;
+import toni.immersivemessages.api.ImmersiveMessage;
 import toni.lib.networking.ToniPacket;
 
 #if MC > "201"
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 #else
 import toni.lib.networking.codecs.StreamCodec;
