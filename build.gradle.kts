@@ -14,7 +14,7 @@ val settings = object : TxniTemplateSettings {
 		override fun addFabric(deps: DependencyHandlerScope) {
 
 			if (mod.mcVersion == "1.21.1") {
-				deps.modImplementation(modrinth("caxton", "0.6.0-alpha.2+1.21.1-FABRIC"))
+				deps.modCompileOnly(modrinth("caxton", "0.6.0-alpha.2+1.21.1-FABRIC"))
 				deps.modImplementation(deps.include("com.github.Chocohead:Fabric-ASM:v2.3") {
 					exclude(group = "net.fabricmc", module = "fabric-loader")
 				})

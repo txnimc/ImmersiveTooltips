@@ -1,0 +1,35 @@
+{
+    "providers": [
+    {
+        "bold": {
+            "file": "immersivemessages:roboto_bold.ttf",
+            "shadow_offset": 0.5
+        },
+        "type": "caxton",
+        "bold_italic": {
+            "file": "immersivemessages:roboto_bolditalic.ttf",
+            "shadow_offset": 0.5
+        },
+        "italic": {
+            "file": "immersivemessages:roboto_italic.ttf",
+            "shadow_offset": 0.5
+        },
+        "regular": {
+            "file": "immersivemessages:roboto_regular.ttf",
+            "shadow_offset": 0.5
+        }
+
+    },
+    {
+        "id": "minecraft:include/space",
+        "type": "reference"
+    },
+    {
+        "id": "minecraft:include/default",
+        "type": "reference"
+    },
+    {
+        "id": "minecraft:include/unifont",
+        "type": "reference"
+    }
+]}

@@ -1,22 +1,15 @@
+Toni's MMC License
 
-The MIT License (MIT)
+In short, this license is intended to be mostly open source with a few protections for mod authors. You may use this mod freely in modpacks, and you may edit and fork this mod under a few conditions:
 
-Copyright (c) 2024 Toni
+- If you fork or modify this mod, or reuse its code, and upload to Curseforge, Modrinth, or a similar site with monetization, 50% of the revenue generated from the fork must go to the original author.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+- You may not reupload this mod to other mod hosting sites that do not pay authors, such as PlanetMinecraft.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+- You may not directly override the Jar file for this mod in a modpack. It must be downloaded from Curseforge or Modrinth.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+- If you modify this software, you must include the same copyright notice for your modified code. You may not relicense the software.
+
+Exceptions / changes may be made to the above terms upon request. For example, if you would like to use small bits of code copied from this mod, as long as your software serves a different purpose than this mod, and they do not constitute a substantial amount of your mod, that is likely okay.
+
+All other rights reserved. Software is provided as-is, and I am not liable for anything you break trying to use my software.
