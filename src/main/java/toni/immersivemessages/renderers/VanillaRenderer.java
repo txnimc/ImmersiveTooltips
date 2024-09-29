@@ -10,9 +10,10 @@ public class VanillaRenderer implements ITooltipRenderer {
         var font = Minecraft.getInstance().font;
 
         graphics.pose().pushPose();
-        tooltip.animation.applyPose(graphics, font.width(tooltip.text), 10f);
+        var width = tooltip.typewriter && !tooltip.typewriterCenterAligned ? font.width(tooltip.getRawText()) : font.width(tooltip.getText());
+        tooltip.animation.applyPose(graphics, width, 10f);
 
-        graphics.drawString(font, tooltip.text, 0, 0, tooltip.animation.getColor(), tooltip.shadow);
+        graphics.drawString(font, tooltip.getText(), 0, 0, tooltip.animation.getColor(), tooltip.shadow);
 
         graphics.pose().popPose();
     }

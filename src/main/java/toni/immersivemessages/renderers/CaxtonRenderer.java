@@ -11,15 +11,28 @@ public class CaxtonRenderer implements ITooltipRenderer {
         var renderer = CaxtonTextRenderer.getInstance();
 
         CaxtonText text = CaxtonText.fromFormatted(
-                tooltip.text,
+                tooltip.getText(),
                 renderer::getFontStorage,
                 tooltip.style,
                 false,
                 renderer.rtl,
                 renderer.getHandler().getCache());
 
+        var width = renderer.getHandler().getWidth(text);
+        if (tooltip.typewriter && !tooltip.typewriterCenterAligned) {
+            CaxtonText rawText = CaxtonText.fromFormatted(
+                tooltip.getRawText(),
+                renderer::getFontStorage,
+                tooltip.style,
+                false,
+                renderer.rtl,
+                renderer.getHandler().getCache());
+
+            width = renderer.getHandler().getWidth(rawText);
+        }
+
         graphics.pose().pushPose();
-        tooltip.animation.applyPose(graphics, renderer.getHandler().getWidth(text), 10f);
+        tooltip.animation.applyPose(graphics, width, 10f);
 
         renderer.draw(text, 0, 0,
                 tooltip.animation.getColor(),

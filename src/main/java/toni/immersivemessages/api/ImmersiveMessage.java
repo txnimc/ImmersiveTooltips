@@ -33,7 +33,7 @@ import java.util.function.Function;
 
 public class ImmersiveMessage {
     public Style style = Style.EMPTY;
-    public String text;
+    private String text;
     public AnimationTimeline animation;
     public ImmersiveMessage subtext;
     public boolean shadow = true;
@@ -47,6 +47,11 @@ public class ImmersiveMessage {
     private float obfuscateSpeed = 1f;
     private float obfuscateTicks;
     private int obfuscateTimes = 1;
+
+    public boolean typewriter = false;
+    public boolean typewriterCenterAligned = false;
+    public float typewriterSpeed = 1f;
+    public String typewriterCurrent;
 
     private ImmersiveMessage() { }
 
@@ -138,6 +143,30 @@ public class ImmersiveMessage {
         tooltip.animation = AnimationTimeline.builder(duration);
         tooltip.animation.withYPosition(tooltip.yLevel);
         return tooltip;
+    }
+
+    public String getText() {
+        if (typewriter) {
+            return typewriterCurrent;
+        }
+
+        return text;
+    }
+
+    public String getRawText() {
+        return text;
+    }
+
+
+    /**
+     * Enables a character-by-character animation
+     */
+    public ImmersiveMessage typewriter(float speed, boolean centerAligned) {
+        this.typewriterSpeed = speed;
+        this.typewriterCurrent = text;
+        this.typewriterCenterAligned = centerAligned;
+        this.typewriter = true;
+        return this;
     }
 
     /**
