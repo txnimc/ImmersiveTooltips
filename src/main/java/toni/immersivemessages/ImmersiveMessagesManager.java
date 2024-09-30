@@ -56,7 +56,7 @@ public class ImmersiveMessagesManager {
     }
 
     static void renderTooltip(GuiGraphics graphics, float deltaTicks, ImmersiveMessage tooltip, int depth) {
-        tooltip.tickObfuscation(deltaTicks);
+        tooltip.tick(deltaTicks);
         tooltip.animation.advancePlayhead(deltaTicks / 20);
 
         if (depth == 0 && tooltip.animation.getCurrent() >= tooltip.animation.duration)

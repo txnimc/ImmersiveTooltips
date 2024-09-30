@@ -1,0 +1,12 @@
+{
+  "vocalsynthlow": {
+    "sounds": [
+      "immersivemessages:vocalsynthlow"
+    ]
+  },
+  "vocalsynthlowshort": {
+    "sounds": [
+      "immersivemessages:vocalsynthlowshort"
+    ]
+  }
+}

@@ -105,6 +105,7 @@ public class ImmersiveMessages #if FABRIC implements ModInitializer, ClientModIn
 
     #if FABRIC @Override #endif
     public void onInitializeClient() {
+        IMClient.init();
         TooltipPacket.registerClient();
 
         #if AFTER_21_1

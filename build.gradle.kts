@@ -181,7 +181,7 @@ loom {
 			ideConfigGenerated(true)
 			vmArgs("-Dmixin.debug.export=true", "-Dsodium.checks.issue2561=false")
 			// Mom look I'm in the codebase!
-			programArgs("--username=${mod.clientuser}", "--uuid=${mod.clientuuid}")
+			//programArgs("--username=${mod.clientuser}", "--uuid=${mod.clientuuid}")
 			runDir = "../../run/${stonecutter.current.project}/"
 		}
 	}

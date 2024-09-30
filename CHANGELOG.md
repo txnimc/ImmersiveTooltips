@@ -1,2 +1,1 @@
-## Changelog
-- Initial release
+API refactor, typewriter text test

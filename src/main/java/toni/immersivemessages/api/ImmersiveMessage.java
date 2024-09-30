@@ -2,13 +2,16 @@ package toni.immersivemessages.api;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
+import toni.immersivemessages.IMClient;
 import toni.immersivemessages.ImmersiveMessages;
 import toni.immersivemessages.ImmersiveFont;
 import toni.immersivemessages.networking.TooltipPacket;
@@ -45,16 +48,20 @@ public class ImmersiveMessage {
 
     private ObfuscateMode obfuscateMode = ObfuscateMode.NONE;
     private float obfuscateSpeed = 1f;
-    private float obfuscateTicks;
-    private int obfuscateTimes = 1;
 
     public boolean typewriter = false;
     public boolean typewriterCenterAligned = false;
     public float typewriterSpeed = 1f;
-    public String typewriterCurrent;
+    public String typewriterCurrent = "";
+
+    public SoundEffect soundEffect = SoundEffect.NONE;
+
+    private float typewriterTicks;
+    private int typewriterTimes = 1;
+    private float obfuscateTicks;
+    private int obfuscateTimes = 1;
 
     private ImmersiveMessage() { }
-
 
     public static final StreamCodec<ByteBuf, ImmersiveMessage> CODEC = new StreamCodec<>() {
         public ImmersiveMessage decode(ByteBuf byteBuf) {
@@ -92,8 +99,12 @@ public class ImmersiveMessage {
 
         buf.writeEnum(obfuscateMode);
         buf.writeFloat(obfuscateSpeed);
-        buf.writeFloat(obfuscateTicks);
-        buf.writeInt(obfuscateTimes);
+
+        buf.writeEnum(soundEffect);
+
+        buf.writeBoolean(typewriter);
+        buf.writeBoolean(typewriterCenterAligned);
+        buf.writeFloat(typewriterSpeed);
     }
 
 
@@ -123,8 +134,12 @@ public class ImmersiveMessage {
 
         ths.obfuscateMode = buf.readEnum(ObfuscateMode.class);
         ths.obfuscateSpeed = buf.readFloat();
-        ths.obfuscateTicks = buf.readFloat();
-        ths.obfuscateTimes = buf.readInt();
+
+        ths.soundEffect = buf.readEnum(SoundEffect.class);
+
+        ths.typewriter = buf.readBoolean();
+        ths.typewriterCenterAligned = buf.readBoolean();
+        ths.typewriterSpeed = buf.readFloat();
 
         return ths;
     }
@@ -163,9 +178,17 @@ public class ImmersiveMessage {
      */
     public ImmersiveMessage typewriter(float speed, boolean centerAligned) {
         this.typewriterSpeed = speed;
-        this.typewriterCurrent = text;
+        this.typewriterCurrent = "";
         this.typewriterCenterAligned = centerAligned;
         this.typewriter = true;
+        return this;
+    }
+
+    /**
+     * Enables a sound effect. Use with typewriter mode!
+     */
+    public ImmersiveMessage sound(SoundEffect effect) {
+        this.soundEffect = effect;
         return this;
     }
 
@@ -450,7 +473,54 @@ public class ImmersiveMessage {
         return this.style(style -> style.withColor(rgb));
     }
 
-    public void tickObfuscation(float delta) {
+
+
+    public void tick(float delta) {
+        tickObfuscation(delta);
+        tickTypewriter(delta);
+    }
+
+    private void tickTypewriter(float delta) {
+        if (typewriterTimes > text.length())
+            return;
+
+        typewriterTicks += delta;
+        if (!(typewriterTicks > typewriterTimes * (1f / typewriterSpeed)))
+            return;
+
+        typewriterTimes++;
+        typewriterCurrent = text.substring(0, Math.min(text.length(), typewriterTimes));
+
+        var lastChar = typewriterCurrent.charAt(typewriterCurrent.length() - 1);
+
+        if (lastChar == ',') {
+            typewriterTicks -= (3f / typewriterSpeed);
+            return;
+        }
+
+        if (lastChar == '.') {
+            typewriterTicks -= 5f * (1f / typewriterSpeed);
+            return;
+        }
+
+        if (lastChar == '§') {
+            typewriterTicks -= 5f * (1f / typewriterSpeed);
+            return;
+        }
+
+        if (lastChar == ' ')
+        {
+            typewriterTicks += (1f / typewriterSpeed);
+            typewriterTimes++;
+            typewriterCurrent = text.substring(0, Math.min(text.length(), typewriterTimes));
+        }
+
+        if (soundEffect != SoundEffect.NONE) {
+            IMClient.playSoundEffect(this);
+        }
+    }
+
+    private void tickObfuscation(float delta) {
         obfuscateTicks += delta;
         if (!(obfuscateTicks > obfuscateTimes * (1f / obfuscateSpeed)))
             return;

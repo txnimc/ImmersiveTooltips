@@ -7,6 +7,7 @@ import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.TextColor;
 import toni.immersivemessages.api.ImmersiveMessage;
+import toni.immersivemessages.api.SoundEffect;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -28,6 +29,8 @@ public class ImmersiveMessagesCommands {
 
                                 ImmersiveMessage.builder(duration, string)
                                     .slideUp()
+                                    .typewriter(1f, false)
+                                    .sound(SoundEffect.LOWSHORT)
                                     .fadeIn()
                                     .fadeOut()
                                     .sendServer(players);
@@ -65,6 +68,7 @@ public class ImmersiveMessagesCommands {
                                         tooltip.fadeIn().fadeOut();
                                     }
 
+                                    if (data.contains("typewriter")) tooltip.typewriter(1f, false);
                                     if (data.contains("bold")) tooltip.bold();
                                     if (data.contains("italic")) tooltip.italic();
                                     if (data.contains("shake")) tooltip.shake();
