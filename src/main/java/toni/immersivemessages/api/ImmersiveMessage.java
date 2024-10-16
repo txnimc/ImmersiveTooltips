@@ -65,7 +65,8 @@ public class ImmersiveMessage {
     private int obfuscateTimes = 1;
 
     public TextAnchor anchor = TextAnchor.CENTER_CENTER;
-    public int wrapMaxWidth = 0;
+    public int wrapMaxWidth = -1;
+    public boolean background = false;
 
     private ImmersiveMessage() { }
 
@@ -113,6 +114,8 @@ public class ImmersiveMessage {
         buf.writeFloat(typewriterSpeed);
 
         buf.writeEnum(anchor);
+        buf.writeInt(wrapMaxWidth);
+        buf.writeBoolean(background);
     }
 
 
@@ -151,6 +154,8 @@ public class ImmersiveMessage {
         ths.typewriterSpeed = buf.readFloat();
 
         ths.anchor = buf.readEnum(TextAnchor.class);
+        ths.wrapMaxWidth = buf.readInt();
+        ths.background = buf.readBoolean();
         return ths;
     }
 

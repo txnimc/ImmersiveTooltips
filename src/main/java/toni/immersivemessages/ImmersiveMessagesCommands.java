@@ -30,12 +30,33 @@ public class ImmersiveMessagesCommands {
                                 var duration = FloatArgumentType.getFloat(context, "duration");
                                 var string = StringArgumentType.getString(context, "string");
 
-                                ImmersiveMessage.builder(duration, string)
-                                    .slideUp()
-                                    .typewriter(1f, false)
-                                    .sound(SoundEffect.LOWSHORT)
-                                    .fadeIn()
-                                    .fadeOut()
+//                                ImmersiveMessage.builder(duration, string)
+//                                    .slideUp()
+//                                    .typewriter(1f, false)
+//                                    .sound(SoundEffect.LOWSHORT)
+//                                    .fadeIn()
+//                                    .fadeOut()
+//                                    .sendServer(players);
+
+                                ImmersiveMessage.builder(15f, "Check out the Quest Book!")
+                                    .anchor(TextAnchor.BOTTOM_LEFT)
+                                    .wrap()
+                                    .y(-20f)
+                                    .x(10f)
+                                    .size(1f)
+                                    .fadeIn(0.5f)
+                                    .fadeOut(0.5f)
+                                    .color(ChatFormatting.GOLD)
+                                    .style(style -> style.withUnderlined(true))
+                                    .subtext(0f, "You can open your §cquest book§r with the button in the top-left corner of your inventory menu, or with a hotkey!", 11f, (subtext) -> subtext
+                                        .anchor(TextAnchor.BOTTOM_LEFT)
+                                        .wrap()
+                                        .font(ImmersiveFont.ROBOTO)
+                                        .x(10f)
+                                        .size(1f)
+                                        .fadeIn(0.5f)
+                                        .fadeOut(0.5f)
+                                    )
                                     .sendServer(players);
 
                                 return 1;
@@ -66,8 +87,11 @@ public class ImmersiveMessagesCommands {
                                     }
 
                                     if (data.contains("typewriter")) tooltip.typewriter(1f, false);
+                                    if (data.contains("sound")) tooltip.sound(SoundEffect.LOWSHORT);
                                     if (data.contains("bold")) tooltip.bold();
                                     if (data.contains("italic")) tooltip.italic();
+                                    if (data.contains("wrap")) tooltip.wrap(0);
+                                    if (data.contains("background")) tooltip.background = true;
                                     if (data.contains("shake")) tooltip.shake();
                                     if (data.contains("wave")) tooltip.wave();
                                     if (data.contains("obfuscate")) tooltip.obfuscate();
