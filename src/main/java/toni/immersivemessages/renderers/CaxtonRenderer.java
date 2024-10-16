@@ -1,14 +1,23 @@
 package toni.immersivemessages.renderers;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import org.joml.Vector3i;
 import toni.immersivemessages.api.ImmersiveMessage;
+import toni.immersivemessages.overlay.OverlayRenderer;
+import toni.immersivemessages.util.AnimationUtil;
 import xyz.flirora.caxton.layout.CaxtonText;
 import xyz.flirora.caxton.render.CaxtonTextRenderer;
+
+import java.util.ArrayList;
 
 public class CaxtonRenderer implements ITooltipRenderer {
     @Override
     public void render(ImmersiveMessage tooltip, GuiGraphics graphics) {
         var renderer = CaxtonTextRenderer.getInstance();
+        var textLines = new ArrayList<Component>();
+
+        var size = wrapText(textLines, tooltip, renderer);
 
         CaxtonText text = CaxtonText.fromFormatted(
                 tooltip.getText(),
@@ -32,7 +41,7 @@ public class CaxtonRenderer implements ITooltipRenderer {
         }
 
         graphics.pose().pushPose();
-        tooltip.animation.applyPose(graphics, width, 10f);
+        AnimationUtil.applyPose(tooltip.animation, graphics, tooltip.anchor, width, 10f);
 
         renderer.draw(text, 0, 0,
                 tooltip.animation.getColor(),
@@ -46,5 +55,20 @@ public class CaxtonRenderer implements ITooltipRenderer {
                 1000f);
 
         graphics.pose().popPose();
+    }
+
+    private static Vector3i wrapText(ArrayList<Component> textLines, ImmersiveMessage tooltip, CaxtonTextRenderer renderer) {
+        textLines.add(tooltip.getText());
+        return OverlayRenderer.wrapText(textLines, -1, (line) -> {
+            CaxtonText txt = CaxtonText.fromFormatted(
+                line,
+                renderer::getFontStorage,
+                line.getStyle(),
+                false,
+                renderer.rtl,
+                renderer.getHandler().getCache());
+
+            return (int) renderer.getHandler().getWidth(txt);
+        });
     }
 }

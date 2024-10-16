@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import toni.immersivemessages.api.ImmersiveMessage;
 import toni.immersivemessages.api.SoundEffect;
+import toni.immersivemessages.api.TextAnchor;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -55,14 +56,8 @@ public class ImmersiveMessagesCommands {
                                     var string = StringArgumentType.getString(context, "string");
 
                                     var tooltip = ImmersiveMessage.builder(duration, string);
-
-                                    if (data.contains("slideup")) tooltip.slideUp();
-                                    else if (data.contains("slidedown")) tooltip.slideDown();
-                                    else if (data.contains("slideleft")) tooltip.slideLeft();
-                                    else if (data.contains("slideright")) tooltip.slideRight();
-                                    else {
-                                        tooltip.slideUp();
-                                    }
+                                    tooltip.y(0f);
+                                    tooltip.animation.withYPosition(0f);
 
                                     if (data.contains("fadein")) tooltip.fadeIn(data.getFloat("fadein"));
                                     else if (data.contains("fadeout")) tooltip.fadeOut(data.getFloat("fadeout"));
@@ -76,11 +71,20 @@ public class ImmersiveMessagesCommands {
                                     if (data.contains("shake")) tooltip.shake();
                                     if (data.contains("wave")) tooltip.wave();
                                     if (data.contains("obfuscate")) tooltip.obfuscate();
+                                    if (data.contains("anchor")) tooltip.anchor(TextAnchor.fromInt(data.getInt("anchor")));
                                     if (data.contains("color")) tooltip.color(TextColor.parseColor(data.getString("color")) #if MC == "211" .getOrThrow() #endif);
                                     if (data.contains("size")) tooltip.size(data.getFloat("size"));
                                     if (data.contains("y")) tooltip.y(data.getFloat("y"));
                                     if (data.contains("x")) tooltip.x(data.getFloat("x"));
                                     if (data.contains("font")) tooltip.font(data.getString("font"));
+
+                                    if (data.contains("slideup")) tooltip.slideUp();
+                                    else if (data.contains("slidedown")) tooltip.slideDown();
+                                    else if (data.contains("slideleft")) tooltip.slideLeft();
+                                    else if (data.contains("slideright")) tooltip.slideRight();
+                                    else {
+                                        tooltip.slideUp();
+                                    }
 
                                     tooltip.sendServer(players);
                                     return 1;

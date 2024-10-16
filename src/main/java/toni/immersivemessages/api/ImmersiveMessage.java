@@ -64,6 +64,9 @@ public class ImmersiveMessage {
     private float obfuscateTicks;
     private int obfuscateTimes = 1;
 
+    public TextAnchor anchor = TextAnchor.CENTER_CENTER;
+    public int wrapMaxWidth = 0;
+
     private ImmersiveMessage() { }
 
     public static final StreamCodec<ByteBuf, ImmersiveMessage> CODEC = new StreamCodec<>() {
@@ -108,6 +111,8 @@ public class ImmersiveMessage {
         buf.writeBoolean(typewriter);
         buf.writeBoolean(typewriterCenterAligned);
         buf.writeFloat(typewriterSpeed);
+
+        buf.writeEnum(anchor);
     }
 
 
@@ -145,6 +150,7 @@ public class ImmersiveMessage {
         ths.typewriterCenterAligned = buf.readBoolean();
         ths.typewriterSpeed = buf.readFloat();
 
+        ths.anchor = buf.readEnum(TextAnchor.class);
         return ths;
     }
 
@@ -200,6 +206,30 @@ public class ImmersiveMessage {
         this.typewriterCurrent = Component.literal("");
         this.typewriterCenterAligned = centerAligned;
         this.typewriter = true;
+        return this;
+    }
+
+    /**
+     * Sets a max width for text, beyond which will be wrapped.
+     */
+    public ImmersiveMessage wrap(int maxWidth) {
+        this.wrapMaxWidth = maxWidth;
+        return this;
+    }
+
+    /**
+     * Wraps long lines of text.
+     */
+    public ImmersiveMessage wrap() {
+        this.wrapMaxWidth = 500;
+        return this;
+    }
+
+    /**
+     * Changes the location on screen to which the text is aligned.
+     */
+    public ImmersiveMessage anchor(TextAnchor anchor) {
+        this.anchor = anchor;
         return this;
     }
 
