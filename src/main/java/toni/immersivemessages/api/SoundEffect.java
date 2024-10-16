@@ -11,8 +11,8 @@ public enum SoundEffect {
     public SoundEvent getSoundEvent() {
         return switch (this) {
             case NONE -> null;
-            case LOW -> IMClient.LOW #if forge .get() #endif;
-            case LOWSHORT -> IMClient.LOWSHORT #if forge .get() #endif;
+            case LOW -> IMClient.LOW #if forgelike .get() #endif;
+            case LOWSHORT -> IMClient.LOWSHORT #if forgelike .get() #endif;
         };
     }
 }

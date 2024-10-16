@@ -23,3 +23,10 @@ mandatory=true
 versionRange="${mc}"
 ordering="NONE"
 side="BOTH"
+
+[[dependencies."${id}"]]
+modId="txnilib"
+mandatory=true
+versionRange="*"
+ordering="NONE"
+side="BOTH"

@@ -1,1 +1,1 @@
-API refactor, typewriter text test
+fix issue with sound registration on forge

@@ -69,6 +69,8 @@ public class ImmersiveMessages #if FABRIC implements ModInitializer, ClientModIn
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
 
+        IMClient.SOUNDS.register(modEventBus);
+
         AllConfigs.register((type, spec) -> {
             #if FORGE
             ModLoadingContext.get().registerConfig(type, spec);

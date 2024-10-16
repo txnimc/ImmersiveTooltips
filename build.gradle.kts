@@ -305,6 +305,9 @@ tasks.processResources {
 	filesMatching("fabric.mod.json") { expand(map) }
 	filesMatching("META-INF/mods.toml") { expand(map) }
 	filesMatching("META-INF/neoforge.mods.toml") { expand(map) }
+
+	if (!mod.isFabric)
+		exclude("fabric.mod.json")
 }
 
 // Publishing

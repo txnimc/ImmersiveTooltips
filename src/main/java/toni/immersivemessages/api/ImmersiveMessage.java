@@ -5,7 +5,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.MinecraftServer;
@@ -36,7 +39,7 @@ import java.util.function.Function;
 
 public class ImmersiveMessage {
     public Style style = Style.EMPTY;
-    private String text;
+    private MutableComponent text;
     public AnimationTimeline animation;
     public ImmersiveMessage subtext;
     public boolean shadow = true;
@@ -52,7 +55,7 @@ public class ImmersiveMessage {
     public boolean typewriter = false;
     public boolean typewriterCenterAligned = false;
     public float typewriterSpeed = 1f;
-    public String typewriterCurrent = "";
+    public MutableComponent typewriterCurrent = Component.literal("");
 
     public SoundEffect soundEffect = SoundEffect.NONE;
 
@@ -81,8 +84,8 @@ public class ImmersiveMessage {
         #else
         buf.writeJsonWithCodec(Style.FORMATTING_CODEC, style);
         #endif
-
-        buf.writeUtf(text);
+        var str = Component.Serializer.toJson(text #if mc > "201", RegistryAccess.EMPTY #endif);
+        buf.writeUtf(str);
         animation.encode(buf);
 
         buf.writeBoolean(subtext != null);
@@ -118,7 +121,8 @@ public class ImmersiveMessage {
         ths.style = buf.readJsonWithCodec(Style.FORMATTING_CODEC);
         #endif
 
-        ths.text = buf.readUtf();
+        var str = buf.readUtf();
+        ths.text = Component.Serializer.fromJson(str #if mc > "201", RegistryAccess.EMPTY #endif);
         ths.animation = AnimationTimeline.decode(buf);
 
         var hasSubtext = buf.readBoolean();
@@ -153,6 +157,21 @@ public class ImmersiveMessage {
      */
     public static ImmersiveMessage builder(float duration, String text) {
         ImmersiveMessage tooltip = new ImmersiveMessage();
+        tooltip.text = Component.literal(text);
+        tooltip.style = Style.EMPTY;
+        tooltip.animation = AnimationTimeline.builder(duration);
+        tooltip.animation.withYPosition(tooltip.yLevel);
+        return tooltip;
+    }
+
+    /**
+     * Creates a new Immersive Tooltip with the specified text and duration.
+     * @param duration how long the animation should play for
+     * @param text the string to show
+     * @return the tooltip builder
+     */
+    public static ImmersiveMessage builder(float duration, MutableComponent text) {
+        ImmersiveMessage tooltip = new ImmersiveMessage();
         tooltip.text = text;
         tooltip.style = Style.EMPTY;
         tooltip.animation = AnimationTimeline.builder(duration);
@@ -160,16 +179,16 @@ public class ImmersiveMessage {
         return tooltip;
     }
 
-    public String getText() {
+    public MutableComponent getText() {
         if (typewriter) {
-            return typewriterCurrent;
+            return typewriterCurrent.withStyle(style);
         }
 
-        return text;
+        return text.withStyle(style);
     }
 
-    public String getRawText() {
-        return text;
+    public MutableComponent getRawText() {
+        return text.withStyle(style);
     }
 
 
@@ -178,7 +197,7 @@ public class ImmersiveMessage {
      */
     public ImmersiveMessage typewriter(float speed, boolean centerAligned) {
         this.typewriterSpeed = speed;
-        this.typewriterCurrent = "";
+        this.typewriterCurrent = Component.literal("");
         this.typewriterCenterAligned = centerAligned;
         this.typewriter = true;
         return this;
@@ -451,13 +470,14 @@ public class ImmersiveMessage {
         this.obfuscateSpeed = speed;
 
         var sb = new StringBuilder();
-        for (var chr : text.toCharArray()) {
+        var str = text.getString();
+        for (var chr : str.toCharArray()) {
             sb.append("§k");
             sb.append(chr);
             sb.append("§r");
         }
 
-        text = sb.toString();
+        text = Component.literal(sb.toString());
         return this;
     }
 
@@ -481,7 +501,8 @@ public class ImmersiveMessage {
     }
 
     private void tickTypewriter(float delta) {
-        if (typewriterTimes > text.length())
+        var str = text.getString();
+        if (typewriterTimes > str.length())
             return;
 
         typewriterTicks += delta;
@@ -489,9 +510,10 @@ public class ImmersiveMessage {
             return;
 
         typewriterTimes++;
-        typewriterCurrent = text.substring(0, Math.min(text.length(), typewriterTimes));
+        var current = str.substring(0, Math.min(str.length(), typewriterTimes));
+        typewriterCurrent = Component.literal(current);
 
-        var lastChar = typewriterCurrent.charAt(typewriterCurrent.length() - 1);
+        var lastChar = current.charAt(current.length() - 1);
 
         if (lastChar == ',') {
             typewriterTicks -= (3f / typewriterSpeed);
@@ -512,7 +534,7 @@ public class ImmersiveMessage {
         {
             typewriterTicks += (1f / typewriterSpeed);
             typewriterTimes++;
-            typewriterCurrent = text.substring(0, Math.min(text.length(), typewriterTimes));
+            typewriterCurrent = Component.literal(str.substring(0, Math.min(str.length(), typewriterTimes)));
         }
 
         if (soundEffect != SoundEffect.NONE) {
@@ -525,25 +547,26 @@ public class ImmersiveMessage {
         if (!(obfuscateTicks > obfuscateTimes * (1f / obfuscateSpeed)))
             return;
 
+        var str = text.getString();
         obfuscateTimes++;
         switch (obfuscateMode) {
-            case LEFT -> text = text.replaceFirst("§k", "");
+            case LEFT -> text = Component.literal(str.replaceFirst("§k", ""));
             case RIGHT -> {
-                int index = text.lastIndexOf("§k");
+                int index = str.lastIndexOf("§k");
                 if (index != -1) {
-                    text = text.substring(0, index) + text.substring(index + 2);
+                    text = Component.literal(str.substring(0, index) + str.substring(index + 2));
                 }
             }
             case CENTER -> {
-                int index = getClosestIndexToCenter(text, "§k");
+                int index = getClosestIndexToCenter(str, "§k");
                 if (index != -1) {
-                    text = text.substring(0, index) + text.substring(index + 2);
+                    text = Component.literal(str.substring(0, index) + str.substring(index + 2));
                 }
             }
             case RANDOM -> {
                 List<Integer> occurrences = new ArrayList<>();
-                for (int i = 0; i <= text.length() - 2; i++) {
-                    if (text.startsWith("§k", i)) {
+                for (int i = 0; i <= str.length() - 2; i++) {
+                    if (str.startsWith("§k", i)) {
                         occurrences.add(i);
                     }
                 }
@@ -552,7 +575,7 @@ public class ImmersiveMessage {
                     Random rand = new Random();
                     int index = occurrences.get(rand.nextInt(occurrences.size()));
 
-                    text = text.substring(0, index) + text.substring(index + 2);
+                    text = Component.literal(str.substring(0, index) + str.substring(index + 2));
                 }
             }
         }
