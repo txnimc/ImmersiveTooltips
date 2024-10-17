@@ -115,9 +115,9 @@ public class ImmersiveMessagesCommands {
                                     if (data.contains("wrap")) tooltip.wrap(0);
 
                                     if (data.contains("background")) tooltip.background();
-                                    if (data.contains("bgColor")) tooltip.backgroundColor(new ImmersiveColor(TextColor.parseColor(data.getString("bgColor")).getOrThrow().getValue()));
-                                    if (data.contains("borderTop")) tooltip.backgroundColor(new ImmersiveColor(TextColor.parseColor(data.getString("borderTop")).getOrThrow().getValue()));
-                                    if (data.contains("borderBottom")) tooltip.backgroundColor(new ImmersiveColor(TextColor.parseColor(data.getString("borderBottom")).getOrThrow().getValue()));
+                                    if (data.contains("bgColor")) tooltip.backgroundColor(new ImmersiveColor(TextColor.parseColor(data.getString("bgColor")) #if MC == "211" .getOrThrow() #endif .getValue() ));
+                                    if (data.contains("borderTop")) tooltip.backgroundColor(new ImmersiveColor(TextColor.parseColor(data.getString("borderTop")) #if MC == "211" .getOrThrow() #endif .getValue() ));
+                                    if (data.contains("borderBottom")) tooltip.backgroundColor(new ImmersiveColor(TextColor.parseColor(data.getString("borderBottom")) #if MC == "211" .getOrThrow() #endif.getValue() ));
                                     if (data.contains("rainbow")) tooltip.rainbow();
 
                                     if (data.contains("shake")) tooltip.shake();

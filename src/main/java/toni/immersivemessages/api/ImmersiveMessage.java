@@ -247,6 +247,7 @@ public class ImmersiveMessage {
             .y(10f)
             .x(10f)
             .size(1f)
+            .background()
             .slideLeft(0.3f)
             .slideOutRight(0.3f)
             .fadeIn(0.5f)

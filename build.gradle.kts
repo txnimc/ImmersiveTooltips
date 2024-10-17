@@ -46,7 +46,6 @@ val templateSettings = object : BlahajSettings {
 	// For configuring the dependecies that will show up on your mod page.
 	override val publishHandler: BlahajPublishDependencyHandler get() = object : BlahajPublishDependencyHandler {
 		override fun addShared(mod : ModData, deps: DependencyContainer) {
-			deps.requires("txnilib")
 			if (mod.isFabric) {
 				deps.requires("fabric-api")
 			}
