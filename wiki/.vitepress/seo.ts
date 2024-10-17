@@ -23,7 +23,7 @@ export function applySEO(pageData: PageData) {
   addTag(pageData, "og:type", "website");
   addTag(pageData, "og:url", `https://template.txni.dev/${pageData.relativePath}`);
   addTag(pageData, "og:description", pageData.description);
-  addTag(pageData, "og:image", "/assets/blahaj-min.png");
+  addTag(pageData, "og:image", "/assets/logo.png");
   addTag(pageData, "og:image:width", "128");
   addTag(pageData, "og:image:height", "128");
 

@@ -66,7 +66,7 @@ public class ImmersiveMessagesManager {
             return;
         }
 
-        renderer.render(tooltip, graphics);
+        renderer.render(tooltip, graphics, deltaTicks);
 
         if (tooltip.subtext != null)
             renderTooltip(graphics, deltaTicks, tooltip.subtext, depth + 1);

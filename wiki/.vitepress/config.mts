@@ -12,14 +12,14 @@ const kotlin2 = JSON.parse(
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   lang: 'en-US',
-  title: "TxniTemplate",
-  description: "Minecraft Template Mod & Multiversion Library",
+  title: "Immersive Messages API",
+  description: "Minecraft Library for Communicating with Players",
   cleanUrls: true,
-  appearance: 'dark',
+  appearance: 'force-dark',
 
   head: [[
     'link',
-    { rel: 'icon', sizes: '32x32', href: '/assets/blahaj-min.png' },
+    { rel: 'icon', sizes: '32x32', href: '/assets/logo.png' },
   ]],
 
   // @ts-ignore
@@ -32,37 +32,27 @@ export default defineConfig({
     outline: {
       level: "deep"
     },
-    logo: "/assets/blahaj-min.png",
+    logo: "/assets/logo.png",
     search: {
       provider: 'local'
     },
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Getting Started', link: '/introduction' }
+      { text: 'Getting Started', link: '/guide' }
     ],
 
     sidebar: [
       {
         text: 'Template Setup',
         items: [
-          { text: 'Introduction', link: '/introduction' },
-          { text: 'Getting Started', link: '/setup' },
-          { text: 'Multiversion Tips', link: '/tips' },
-          { text: 'IntelliJ Setup', link: '/intellij' },
-          { text: 'Dependencies', link: '/dependencies' },
-          { text: 'Flavors', link: '/flavors' },
-        ]
-      },
-      {
-        text: 'Library Usage',
-        items: [
-          { text: 'TxniLib', link: '/lib' }
-        ]
-      },
-      {
-        text: 'Other Resources',
-        items: [
-          { text: 'Helpful Resources', link: '/resources' }
+          { text: 'Getting Started', link: '/guide', items: [
+              { text: 'Sending Messages', link: '/api' },
+              { text: 'Styling Messages', link: '/styling' },
+              { text: 'Animating Messages', link: '/animation' },
+              { text: 'Message Presets', link: '/presets' }
+            ]
+          },
+          { text: 'Command Reference', link: '/commands' }
         ]
       }
     ],

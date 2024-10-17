@@ -3,6 +3,7 @@ package toni.immersivemessages.api;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.RegistryAccess;
@@ -17,7 +18,10 @@ import org.jetbrains.annotations.Nullable;
 import toni.immersivemessages.IMClient;
 import toni.immersivemessages.ImmersiveMessages;
 import toni.immersivemessages.ImmersiveFont;
+import toni.immersivemessages.ImmersiveMessagesManager;
+import toni.immersivemessages.config.AllConfigs;
 import toni.immersivemessages.networking.TooltipPacket;
+import toni.immersivemessages.util.ImmersiveColor;
 import toni.lib.animation.AnimationTimeline;
 import toni.lib.animation.Binding;
 import toni.lib.animation.easing.EasingType;
@@ -65,8 +69,14 @@ public class ImmersiveMessage {
     private int obfuscateTimes = 1;
 
     public TextAnchor anchor = TextAnchor.CENTER_CENTER;
+    public TextAnchor align = TextAnchor.CENTER_CENTER;
     public int wrapMaxWidth = -1;
+
     public boolean background = false;
+    public ImmersiveColor colorBackground = ImmersiveColor.BLACK.copy();
+    public ImmersiveColor colorBorderTop = new ImmersiveColor(36,1,89,255).mixWith(ImmersiveColor.WHITE, 0.1f);
+    public ImmersiveColor colorBorderBot = new ImmersiveColor(25,1,53,255);
+    public float rainbow = -1f;
 
     private ImmersiveMessage() { }
 
@@ -114,8 +124,15 @@ public class ImmersiveMessage {
         buf.writeFloat(typewriterSpeed);
 
         buf.writeEnum(anchor);
+        buf.writeEnum(align);
         buf.writeInt(wrapMaxWidth);
         buf.writeBoolean(background);
+
+        buf.writeInt(colorBackground.getRGB());
+        buf.writeInt(colorBorderTop.getRGB());
+        buf.writeInt(colorBorderBot.getRGB());
+
+        buf.writeFloat(rainbow);
     }
 
 
@@ -154,8 +171,16 @@ public class ImmersiveMessage {
         ths.typewriterSpeed = buf.readFloat();
 
         ths.anchor = buf.readEnum(TextAnchor.class);
+        ths.align = buf.readEnum(TextAnchor.class);
         ths.wrapMaxWidth = buf.readInt();
         ths.background = buf.readBoolean();
+
+        ths.colorBackground = new ImmersiveColor(buf.readInt());
+        ths.colorBorderTop = new ImmersiveColor(buf.readInt());
+        ths.colorBorderBot = new ImmersiveColor(buf.readInt());
+
+        ths.rainbow = buf.readFloat();
+
         return ths;
     }
 
@@ -190,6 +215,72 @@ public class ImmersiveMessage {
         return tooltip;
     }
 
+
+
+    public static ImmersiveMessage popup(float duration, String title, String subtitle) {
+        return ImmersiveMessage.builder(duration, title)
+            .anchor(TextAnchor.CENTER_CENTER)
+            .wrap(200)
+            .size(1f)
+            .background()
+            .slideUp(0.3f)
+            .slideOutDown(0.3f)
+            .fadeIn(0.5f)
+            .fadeOut(0.5f)
+            .color(ChatFormatting.GOLD)
+            .style(style -> style.withUnderlined(true))
+            .subtext(0f, subtitle, 8f, (subtext) -> subtext
+                .anchor(TextAnchor.CENTER_CENTER)
+                .wrap(200)
+                .size(1f)
+                .slideUp(0.3f)
+                .slideOutDown(0.3f)
+                .fadeIn(0.5f)
+                .fadeOut(0.5f)
+            );
+    }
+
+    public static ImmersiveMessage toast(float duration, String title, String subtitle) {
+        return ImmersiveMessage.builder(duration, title)
+            .anchor(TextAnchor.TOP_LEFT)
+            .wrap()
+            .y(10f)
+            .x(10f)
+            .size(1f)
+            .slideLeft(0.3f)
+            .slideOutRight(0.3f)
+            .fadeIn(0.5f)
+            .fadeOut(0.5f)
+            .color(ChatFormatting.GOLD)
+            .style(style -> style.withUnderlined(true))
+            .subtext(0f, subtitle, 11f, (subtext) -> subtext
+                .anchor(TextAnchor.TOP_LEFT)
+                .wrap()
+                .x(10f)
+                .size(1f)
+                .slideLeft(0.3f)
+                .slideOutRight(0.3f)
+                .fadeIn(0.5f)
+                .fadeOut(0.5f)
+            );
+    }
+
+
+    public void render(GuiGraphics graphics, float deltaTicks) { render(graphics, deltaTicks, 0); }
+
+    private void render(GuiGraphics graphics, float deltaTicks, int depth) {
+        tick(deltaTicks);
+        animation.advancePlayhead(deltaTicks / 20);
+
+        if (depth == 0 && animation.getCurrent() >= animation.duration)
+            return;
+
+        ImmersiveMessagesManager.getRenderer().render(this, graphics, deltaTicks);
+
+        if (subtext != null)
+            subtext.render(graphics, deltaTicks, depth + 1);
+    }
+
     public MutableComponent getText() {
         if (typewriter) {
             return typewriterCurrent.withStyle(style);
@@ -215,6 +306,42 @@ public class ImmersiveMessage {
     }
 
     /**
+     * Enables a background.
+     */
+    public ImmersiveMessage background() {
+        this.background = true;
+        return this;
+    }
+
+    /**
+     * Changes the border color to a rainbow effect, optionally with speed (default 2f).
+     */
+    public ImmersiveMessage rainbow() { return rainbow(2f); }
+    public ImmersiveMessage rainbow(float speed) {
+        this.background = true;
+        this.rainbow = speed * 20f;
+        return this;
+    }
+
+    public ImmersiveMessage backgroundColor(int color) { return backgroundColor(new ImmersiveColor(color));}
+    public ImmersiveMessage backgroundColor(ImmersiveColor color) {
+        this.colorBackground = color;
+        return this;
+    }
+
+    public ImmersiveMessage borderTopColor(int color) { return borderTopColor(new ImmersiveColor(color));}
+    public ImmersiveMessage borderTopColor(ImmersiveColor color) {
+        this.colorBorderTop = color;
+        return this;
+    }
+
+    public ImmersiveMessage borderBottomColor(int color) { return borderBottomColor(new ImmersiveColor(color));}
+    public ImmersiveMessage borderBottomColor(ImmersiveColor color) {
+        this.colorBorderBot = color;
+        return this;
+    }
+
+    /**
      * Sets a max width for text, beyond which will be wrapped.
      */
     public ImmersiveMessage wrap(int maxWidth) {
@@ -226,7 +353,7 @@ public class ImmersiveMessage {
      * Wraps long lines of text.
      */
     public ImmersiveMessage wrap() {
-        this.wrapMaxWidth = 500;
+        this.wrapMaxWidth = 0;
         return this;
     }
 
@@ -235,6 +362,14 @@ public class ImmersiveMessage {
      */
     public ImmersiveMessage anchor(TextAnchor anchor) {
         this.anchor = anchor;
+        return this;
+    }
+
+    /**
+     * Changes the local offset of the text bounding box
+     */
+    public ImmersiveMessage align(TextAnchor anchor) {
+        this.align = anchor;
         return this;
     }
 
@@ -391,6 +526,30 @@ public class ImmersiveMessage {
     public ImmersiveMessage slideRight() { return slideRight(1f); }
     public ImmersiveMessage slideRight(float duration) {
         animation.transition(Binding.xPos, delay, delay + duration, xLevel + 50f, xLevel, EasingType.EaseOutCubic);
+        return this;
+    }
+
+    public ImmersiveMessage slideOutUp() { return slideOutUp(1f); }
+    public ImmersiveMessage slideOutUp(float duration) {
+        animation.transition(Binding.yPos, animation.duration - duration, animation.duration, yLevel, yLevel - 50f, EasingType.EaseOutCubic);
+        return this;
+    }
+
+    public ImmersiveMessage slideOutDown() { return slideOutDown(1f); }
+    public ImmersiveMessage slideOutDown(float duration) {
+        animation.transition(Binding.yPos, animation.duration - duration, animation.duration, yLevel, yLevel + 50f, EasingType.EaseOutCubic);
+        return this;
+    }
+
+    public ImmersiveMessage slideOutLeft() { return slideOutLeft(1f); }
+    public ImmersiveMessage slideOutLeft(float duration) {
+        animation.transition(Binding.xPos, animation.duration - duration, animation.duration, xLevel, xLevel - 50f, EasingType.EaseOutCubic);
+        return this;
+    }
+
+    public ImmersiveMessage slideOutRight() { return slideOutRight(1f); }
+    public ImmersiveMessage slideOutRight(float duration) {
+        animation.transition(Binding.xPos, animation.duration - duration, animation.duration, xLevel, xLevel + 50f, EasingType.EaseOutCubic);
         return this;
     }
 

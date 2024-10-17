@@ -2,10 +2,10 @@ package toni.immersivemessages.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FastColor;
+import org.joml.Vector2i;
 import org.joml.Vector3i;
 import toni.immersivemessages.api.ImmersiveMessage;
 
@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.function.Function;
 
 public class RenderUtil {
-    public static void drawBackground(ImmersiveMessage tooltip, GuiGraphics graphics, Vector3i size) {
+    private static double totalTicks = 0;
+
+    public static void drawBackground(ImmersiveMessage tooltip, GuiGraphics graphics, Vector3i size, Vector2i bgOffset, float deltaTicks) {
         var width = size.x;
         var height = size.y;
         var titleLinesCount = size.z;
@@ -33,18 +35,31 @@ public class RenderUtil {
         var yMaxB = height + 4;
         var yMinB = height + 3;
 
+
         float fade = FastColor.ARGB32.alpha(tooltip.animation.getColor()) / 255f;
-        ImmersiveColor colorBackground = ImmersiveColor.BLACK.copy().scaleAlpha(0.75f * fade);
-        ImmersiveColor colorBorderTop = new ImmersiveColor(36,1,89,255).mixWith(ImmersiveColor.WHITE, 0.1f).scaleAlpha(0.75f * fade);
-        ImmersiveColor colorBorderBot = new ImmersiveColor(25,1,53,255).scaleAlpha(0.75f * fade);
+        ImmersiveColor colorBackground = tooltip.colorBackground.copy().scaleAlpha(0.75f * fade);
+        ImmersiveColor colorBorderTop;
+        ImmersiveColor colorBorderBot;
+
+        if (tooltip.rainbow >= 0f) {
+            totalTicks += deltaTicks * tooltip.rainbow ;
+
+            colorBorderTop = ImmersiveColor.rainbowColor((int) totalTicks).scaleAlpha(0.75f * fade);
+            colorBorderBot = ImmersiveColor.rainbowColor((int) totalTicks).scaleAlpha(0.75f * fade);
+        }
+        else {
+            colorBorderTop = tooltip.colorBorderTop.copy().scaleAlpha(0.75f * fade);
+            colorBorderBot = tooltip.colorBorderBot.copy().scaleAlpha(0.75f * fade);
+        }
+
 
         var backgroundColor = colorBackground.getRGB();
         var borderColorStart = colorBorderTop.getRGB();
         var borderColorEnd = colorBorderBot.getRGB();
 
         graphics.pose().pushPose();
-        graphics.pose().translate(0.0D, 0.0D, -5f);
-        AnimationUtil.applyPose(tooltip.animation, graphics, tooltip.anchor, size.x, size.y);
+        graphics.pose().translate(bgOffset.x, bgOffset.y, -5f);
+        AnimationUtil.applyPose(tooltip.animation, graphics, bgOffset, tooltip.anchor, tooltip.align, size.x, size.y);
         // main background
         graphics.fillGradient(xMaxL, yMinT, xMinR, yMaxT, backgroundColor, backgroundColor);
 
@@ -83,7 +98,7 @@ public class RenderUtil {
 
         if (maxTextWidth >= 0)
         {
-            if (tooltipTextWidth + 2 > screenWidth / 2)
+            if (tooltipTextWidth > screenWidth / 2)
             {
                 tooltipTextWidth = (screenWidth / 2);
                 needsWrap = true;

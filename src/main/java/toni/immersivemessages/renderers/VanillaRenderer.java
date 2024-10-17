@@ -5,31 +5,32 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.locale.Language;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FastColor;
 import org.joml.Matrix4f;
+import org.joml.Vector2i;
 import org.joml.Vector3i;
 import toni.immersivemessages.api.ImmersiveMessage;
 import toni.immersivemessages.util.AnimationUtil;
 import toni.immersivemessages.util.RenderUtil;
-import xyz.flirora.caxton.layout.CaxtonText;
-import xyz.flirora.caxton.render.CaxtonTextRenderer;
 import com.mojang.blaze3d.vertex.*;
 
 import java.util.ArrayList;
 
 public class VanillaRenderer implements ITooltipRenderer {
     @Override
-    public void render(ImmersiveMessage tooltip, GuiGraphics graphics) {
+    public void render(ImmersiveMessage tooltip, GuiGraphics graphics, float deltaTicks) {
         var font = Minecraft.getInstance().font;
 
-        var textLines = new ArrayList<Component>();
+        var textLines = new ArrayList<FormattedText>();
         textLines.add(tooltip.getText());
 
         var size = wrapText(textLines, tooltip);
+        var bgOffset = tooltip.anchor.getNormalized();
+        bgOffset = bgOffset.add(tooltip.align.getNormalized().mul(-1));
 
         if (tooltip.background)
-            RenderUtil.drawBackground(tooltip, graphics, size);
+            RenderUtil.drawBackground(tooltip, graphics, size, bgOffset.mul(-3, new Vector2i()), deltaTicks);
 
         int yOffset = 0;
         float fade = FastColor.ARGB32.alpha(tooltip.animation.getColor()) / 255f;
@@ -37,14 +38,13 @@ public class VanillaRenderer implements ITooltipRenderer {
 
         for (int lineNumber = 0; lineNumber < textLines.size(); ++lineNumber)
         {
-            Component line = textLines.get(lineNumber);
+            FormattedText line = textLines.get(lineNumber);
             if (line != null)
             {
                 graphics.pose().pushPose();
-                var lineWidth = tooltip.typewriter && !tooltip.typewriterCenterAligned ? getTypewriterWidth(graphics, tooltip) : font.width(line);
+                var lineWidth = tooltip.typewriter && !tooltip.typewriterCenterAligned ? getTypewriterWidth(graphics, tooltip, textLines.size() == 1 ? tooltip.getRawText() : line) : font.width(line);
 
-                AnimationUtil.applyPose(tooltip.animation, graphics, tooltip.anchor, lineWidth, size.y);
-                graphics.pose().translate(0.0D, 0.0D, 0.1f);
+                AnimationUtil.applyPose(tooltip.animation, graphics, bgOffset.mul(-6, new Vector2i()), tooltip.anchor, tooltip.align, lineWidth, size.y);
                 Matrix4f mat = graphics.pose().last().pose();
 
                 font.drawInBatch(
@@ -68,11 +68,11 @@ public class VanillaRenderer implements ITooltipRenderer {
         renderType.endBatch();
     }
 
-    private static Vector3i wrapText(ArrayList<Component> textLines, ImmersiveMessage tooltip) {
+    private static Vector3i wrapText(ArrayList<FormattedText> textLines, ImmersiveMessage tooltip) {
         var size = RenderUtil.wrapText(textLines, tooltip.wrapMaxWidth, (line) -> Minecraft.getInstance().font.width(line));
 
         if (tooltip.subtext != null) {
-            var subtextLines = new ArrayList<Component>();
+            var subtextLines = new ArrayList<FormattedText>();
             subtextLines.add(tooltip.subtext.getText());
             var subtextSize = wrapText(subtextLines, tooltip.subtext);
 
@@ -86,10 +86,10 @@ public class VanillaRenderer implements ITooltipRenderer {
         return size;
     }
 
-    private float getTypewriterWidth(GuiGraphics graphics, ImmersiveMessage tooltip) {
-        if (tooltip.wrapMaxWidth > 0)
-            return Math.min(tooltip.wrapMaxWidth, graphics.guiWidth() / 2f);
+    private float getTypewriterWidth(GuiGraphics graphics, ImmersiveMessage tooltip, FormattedText line) {
+        if (tooltip.wrapMaxWidth >= 0)
+            return tooltip.wrapMaxWidth == 0 ? graphics.guiWidth() / 2f : Math.max(tooltip.wrapMaxWidth, graphics.guiWidth() / 2f);
 
-        return Minecraft.getInstance().font.width(tooltip.getRawText());
+        return Minecraft.getInstance().font.width(line);
     }
 }

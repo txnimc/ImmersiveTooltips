@@ -2,7 +2,9 @@ package toni.immersivemessages.renderers;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FastColor;
+import org.joml.Vector2i;
 import org.joml.Vector3i;
 import toni.immersivemessages.api.ImmersiveMessage;
 import toni.immersivemessages.util.AnimationUtil;
@@ -15,35 +17,36 @@ import java.util.ArrayList;
 
 public class CaxtonRenderer implements ITooltipRenderer {
     @Override
-    public void render(ImmersiveMessage tooltip, GuiGraphics graphics) {
+    public void render(ImmersiveMessage tooltip, GuiGraphics graphics, float deltaTicks) {
         var renderer = CaxtonTextRenderer.getInstance();
-        var textLines = new ArrayList<Component>();
+        var textLines = new ArrayList<FormattedText>();
 
         var size = wrapText(textLines, tooltip, renderer);
+        var bgOffset = tooltip.anchor.getNormalized();
+        bgOffset = bgOffset.add(tooltip.align.getNormalized().mul(-1));
 
         if (tooltip.background)
-            RenderUtil.drawBackground(tooltip, graphics, size);
+            RenderUtil.drawBackground(tooltip, graphics, size, bgOffset.mul(-3, new Vector2i()), deltaTicks);
 
         int yOffset = 0;
         for (int lineNumber = 0; lineNumber < textLines.size(); ++lineNumber)
         {
-            Component line = textLines.get(lineNumber);
+            FormattedText line = textLines.get(lineNumber);
             if (line != null)
             {
                 CaxtonText text = CaxtonText.fromFormatted(
                     line,
                     renderer::getFontStorage,
-                    line.getStyle(),
+                    tooltip.style,
                     false,
                     renderer.rtl,
                     renderer.getHandler().getCache());
 
                 var lineWidth = renderer.getHandler().getWidth(text);
-                lineWidth = adjustLineWidthForTypewriter(tooltip, graphics, lineWidth, line, renderer);
+                lineWidth = adjustLineWidthForTypewriter(tooltip, graphics, lineWidth, textLines.size() == 1 ? tooltip.getRawText() : line, renderer);
 
                 graphics.pose().pushPose();
-                AnimationUtil.applyPose(tooltip.animation, graphics, tooltip.anchor, lineWidth, size.y);
-
+                AnimationUtil.applyPose(tooltip.animation, graphics, bgOffset.mul(-6, new Vector2i()), tooltip.anchor, tooltip.align, lineWidth, size.y);
                 graphics.pose().translate(0.0D, 0.0D, 0.1f);
 
                 renderer.draw(text, 0, yOffset,
@@ -64,12 +67,12 @@ public class CaxtonRenderer implements ITooltipRenderer {
         }
     }
 
-    private static float adjustLineWidthForTypewriter(ImmersiveMessage tooltip, GuiGraphics graphics, float lineWidth, Component line, CaxtonTextRenderer renderer) {
+    private static float adjustLineWidthForTypewriter(ImmersiveMessage tooltip, GuiGraphics graphics, float lineWidth, FormattedText line, CaxtonTextRenderer renderer) {
         if (!tooltip.typewriter || tooltip.typewriterCenterAligned)
             return lineWidth;
 
-        if (tooltip.wrapMaxWidth > 0)
-            return Math.min(tooltip.wrapMaxWidth, graphics.guiWidth() / 2f);
+        if (tooltip.wrapMaxWidth >= 0)
+            return tooltip.wrapMaxWidth == 0 ? graphics.guiWidth() / 2f : Math.max(tooltip.wrapMaxWidth, graphics.guiWidth() / 2f);
 
         CaxtonText rawText = CaxtonText.fromFormatted(
             line,
@@ -82,14 +85,14 @@ public class CaxtonRenderer implements ITooltipRenderer {
         return renderer.getHandler().getWidth(rawText);
     }
 
-    private static Vector3i wrapText(ArrayList<Component> textLines, ImmersiveMessage tooltip, CaxtonTextRenderer renderer) {
+    private static Vector3i wrapText(ArrayList<FormattedText> textLines, ImmersiveMessage tooltip, CaxtonTextRenderer renderer) {
         textLines.add(tooltip.getText());
 
         var size = RenderUtil.wrapText(textLines, tooltip.wrapMaxWidth, (line) -> {
             CaxtonText txt = CaxtonText.fromFormatted(
                 line,
                 renderer::getFontStorage,
-                line.getStyle(),
+                tooltip.style,
                 false,
                 renderer.rtl,
                 renderer.getHandler().getCache());
@@ -98,12 +101,14 @@ public class CaxtonRenderer implements ITooltipRenderer {
         });
 
         if (tooltip.subtext != null) {
-            var subtextLines = new ArrayList<Component>();
+            var subtextLines = new ArrayList<FormattedText>();
             var subtextSize = wrapText(subtextLines, tooltip.subtext, renderer);
 
+            var yOffset = Math.max(0, tooltip.subtext.yLevel - tooltip.yLevel);
+            var xOffset = Math.max(0, tooltip.subtext.xLevel - tooltip.xLevel);
             return new Vector3i(
-                Math.max(size.x, subtextSize.x),
-                Math.max(size.y, subtextSize.y),
+                Math.max(size.x, (int) xOffset * 2 + subtextSize.x),
+                Math.max(size.y, (int) yOffset * 2 + subtextSize.y),
                 Math.max(size.z, subtextSize.z)
             );
         }
