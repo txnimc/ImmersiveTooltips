@@ -15,9 +15,9 @@ export function applySEO(pageData: PageData) {
   addTag(
     pageData,
     "og:title",
-    pageData.title === "TxniTemplate"
-      ? `TxniTemplate`
-      : `${pageData.title} | TxniTemplate`
+    pageData.title === "Immersive Messages API"
+      ? `Immersive Messages API`
+      : `${pageData.title} | Immersive Messages API`
   );
 
   addTag(pageData, "og:type", "website");

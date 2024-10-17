@@ -58,7 +58,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/txnimc/TxniTemplate' },
+      { icon: 'github', link: 'https://github.com/txnimc/ImmersiveMessages' },
       { icon: 'discord', link: 'https://discord.gg/kS7auUeYmc'}
     ],
     sitemap: {

@@ -5,9 +5,6 @@ layout: home
 hero:
   name: "Immersive Messages API"
   text: ""
-  image:
-    src: /assets/blahaj-min.png
-    alt: TxniTemplate
   tagline: Minecraft Library for Communicating with Players
   actions:
     - theme: brand
