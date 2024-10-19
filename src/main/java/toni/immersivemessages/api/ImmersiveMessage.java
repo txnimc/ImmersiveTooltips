@@ -15,6 +15,7 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
+import toni.SoundUtil;
 import toni.immersivemessages.IMClient;
 import toni.immersivemessages.ImmersiveMessages;
 import toni.immersivemessages.ImmersiveFont;
@@ -46,6 +47,7 @@ public class ImmersiveMessage {
     private MutableComponent text;
     public AnimationTimeline animation;
     public ImmersiveMessage subtext;
+    public ImmersiveMessage parent;
     public boolean shadow = true;
     public boolean border;
 
@@ -153,6 +155,7 @@ public class ImmersiveMessage {
         var hasSubtext = buf.readBoolean();
         if (hasSubtext) {
             ths.subtext = ImmersiveMessage.decode(buf);
+            ths.subtext.parent = ths;
         }
 
         ths.shadow = buf.readBoolean();
@@ -415,6 +418,8 @@ public class ImmersiveMessage {
         this.subtext.delay = delay;
         this.subtext.y(this.yLevel + offset);
         this.subtext.size(0.75f);
+        this.subtext.parent = this;
+
         builder.accept(this.subtext);
         return this;
     }
@@ -733,7 +738,7 @@ public class ImmersiveMessage {
         }
 
         if (soundEffect != SoundEffect.NONE) {
-            IMClient.playSoundEffect(this);
+            SoundUtil.playSoundEffect(this);
         }
     }
 

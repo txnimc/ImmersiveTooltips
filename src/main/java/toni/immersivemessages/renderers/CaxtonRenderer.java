@@ -20,8 +20,8 @@ public class CaxtonRenderer implements ITooltipRenderer {
     public void render(ImmersiveMessage tooltip, GuiGraphics graphics, float deltaTicks) {
         var renderer = CaxtonTextRenderer.getInstance();
         var textLines = new ArrayList<FormattedText>();
-
-        var size = wrapText(textLines, tooltip, renderer);
+        textLines.add(tooltip.getText());
+        var size = wrapText(textLines, tooltip, renderer, tooltip.parent == null);
         var bgOffset = tooltip.anchor.getNormalized();
         bgOffset = bgOffset.add(tooltip.align.getNormalized().mul(-1));
 
@@ -85,34 +85,37 @@ public class CaxtonRenderer implements ITooltipRenderer {
         return renderer.getHandler().getWidth(rawText);
     }
 
-    private static Vector3i wrapText(ArrayList<FormattedText> textLines, ImmersiveMessage tooltip, CaxtonTextRenderer renderer) {
-        textLines.add(tooltip.getText());
+    private static Vector3i wrapText(ArrayList<FormattedText> textLines, ImmersiveMessage tooltip, CaxtonTextRenderer renderer, boolean isCallingFromRoot) {
+        if (tooltip.parent == null || isCallingFromRoot) {
+            var size = RenderUtil.wrapText(textLines, tooltip.wrapMaxWidth, (line) -> {
+                CaxtonText txt = CaxtonText.fromFormatted(
+                    line,
+                    renderer::getFontStorage,
+                    tooltip.style,
+                    false,
+                    renderer.rtl,
+                    renderer.getHandler().getCache());
 
-        var size = RenderUtil.wrapText(textLines, tooltip.wrapMaxWidth, (line) -> {
-            CaxtonText txt = CaxtonText.fromFormatted(
-                line,
-                renderer::getFontStorage,
-                tooltip.style,
-                false,
-                renderer.rtl,
-                renderer.getHandler().getCache());
+                return (int) renderer.getHandler().getWidth(txt);
+            });
 
-            return (int) renderer.getHandler().getWidth(txt);
-        });
+            if (tooltip.subtext != null) {
+                var subtextLines = new ArrayList<FormattedText>();
+                subtextLines.add(tooltip.subtext.getText());
+                var subtextSize = wrapText(subtextLines, tooltip.subtext, renderer, true);
 
-        if (tooltip.subtext != null) {
-            var subtextLines = new ArrayList<FormattedText>();
-            var subtextSize = wrapText(subtextLines, tooltip.subtext, renderer);
+                var yOffset = Math.max(0, tooltip.subtext.yLevel - tooltip.yLevel);
+                var xOffset = Math.max(0, tooltip.subtext.xLevel - tooltip.xLevel);
+                return new Vector3i(
+                    Math.max(size.x, (int) xOffset + subtextSize.x),
+                    Math.max(size.y, (int) yOffset + subtextSize.y),
+                    Math.max(size.z, subtextSize.z)
+                );
+            }
 
-            var yOffset = Math.max(0, tooltip.subtext.yLevel - tooltip.yLevel);
-            var xOffset = Math.max(0, tooltip.subtext.xLevel - tooltip.xLevel);
-            return new Vector3i(
-                Math.max(size.x, (int) xOffset * 2 + subtextSize.x),
-                Math.max(size.y, (int) yOffset * 2 + subtextSize.y),
-                Math.max(size.z, subtextSize.z)
-            );
+            return size;
+        } else {
+            return wrapText(textLines, tooltip.parent, renderer, false);
         }
-
-        return size;
     }
 }

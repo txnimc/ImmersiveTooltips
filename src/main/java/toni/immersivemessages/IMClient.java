@@ -1,8 +1,5 @@
 package toni.immersivemessages;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -49,21 +46,4 @@ public class IMClient {
     public static void init() {
 
     }
-
-    public static void playSoundEffect(ImmersiveMessage immersiveMessage) {
-        var handler = Minecraft.getInstance().getSoundManager();
-        handler.play(SimpleSoundInstance.forUI(immersiveMessage.soundEffect.getSoundEvent(), 1f, 0.01f));
-    }
-
-    #if NEO
-    public static boolean unfreeze() {
-        ((MappedRegistry<SoundEvent>) BuiltInRegistries.SOUND_EVENT).unfreeze();
-        return true;
-    }
-
-    public static boolean refreeze() {
-        BuiltInRegistries.SOUND_EVENT.freeze();
-        return true;
-    }
-    #endif
 }

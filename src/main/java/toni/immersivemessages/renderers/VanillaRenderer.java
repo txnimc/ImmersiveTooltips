@@ -14,6 +14,7 @@ import toni.immersivemessages.api.ImmersiveMessage;
 import toni.immersivemessages.util.AnimationUtil;
 import toni.immersivemessages.util.RenderUtil;
 import com.mojang.blaze3d.vertex.*;
+import xyz.flirora.caxton.layout.CaxtonText;
 
 import java.util.ArrayList;
 
@@ -25,7 +26,7 @@ public class VanillaRenderer implements ITooltipRenderer {
         var textLines = new ArrayList<FormattedText>();
         textLines.add(tooltip.getText());
 
-        var size = wrapText(textLines, tooltip);
+        var size = wrapText(textLines, tooltip, false);
         var bgOffset = tooltip.anchor.getNormalized();
         bgOffset = bgOffset.add(tooltip.align.getNormalized().mul(-1));
 
@@ -68,22 +69,28 @@ public class VanillaRenderer implements ITooltipRenderer {
         renderType.endBatch();
     }
 
-    private static Vector3i wrapText(ArrayList<FormattedText> textLines, ImmersiveMessage tooltip) {
-        var size = RenderUtil.wrapText(textLines, tooltip.wrapMaxWidth, (line) -> Minecraft.getInstance().font.width(line));
+    private static Vector3i wrapText(ArrayList<FormattedText> textLines, ImmersiveMessage tooltip, boolean isCallingFromRoot) {
+        if (tooltip.parent == null || isCallingFromRoot) {
+            var size = RenderUtil.wrapText(textLines, tooltip.wrapMaxWidth, (line) -> Minecraft.getInstance().font.width(line));
 
-        if (tooltip.subtext != null) {
-            var subtextLines = new ArrayList<FormattedText>();
-            subtextLines.add(tooltip.subtext.getText());
-            var subtextSize = wrapText(subtextLines, tooltip.subtext);
+            if (tooltip.subtext != null) {
+                var subtextLines = new ArrayList<FormattedText>();
+                subtextLines.add(tooltip.subtext.getText());
+                var subtextSize = wrapText(subtextLines, tooltip.subtext, true);
 
-            return new Vector3i(
-                Math.max(size.x, subtextSize.x),
-                Math.max(size.y, subtextSize.y),
-                Math.max(size.z, subtextSize.z)
-            );
+                var yOffset = Math.max(0, tooltip.subtext.yLevel - tooltip.yLevel);
+                var xOffset = Math.max(0, tooltip.subtext.xLevel - tooltip.xLevel);
+                return new Vector3i(
+                    Math.max(size.x, (int) xOffset + subtextSize.x),
+                    Math.max(size.y, (int) yOffset + subtextSize.y),
+                    Math.max(size.z, subtextSize.z)
+                );
+            }
+
+            return size;
+        } else {
+            return wrapText(textLines, tooltip.parent, false);
         }
-
-        return size;
     }
 
     private float getTypewriterWidth(GuiGraphics graphics, ImmersiveMessage tooltip, FormattedText line) {
