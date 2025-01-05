@@ -13,6 +13,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 #if FABRIC
     import net.fabricmc.api.ClientModInitializer;
     import net.fabricmc.api.ModInitializer;
+    import net.fabricmc.loader.api.FabricLoader;
+    import net.fabricmc.api.EnvType;
 
     #if after_21_1
     import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
@@ -33,6 +35,8 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLLoader;
 #endif
 
 
@@ -45,6 +49,8 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.api.distmarker.Dist;
 #endif
 
 
@@ -76,7 +82,6 @@ public class ImmersiveMessages #if FABRIC implements ModInitializer, ClientModIn
             ModLoadingContext.get().registerConfig(type, spec);
             #elif NEO
             modContainer.registerConfig(type, spec);
-            modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
             #endif
         });
         #endif
@@ -129,4 +134,14 @@ public class ImmersiveMessages #if FABRIC implements ModInitializer, ClientModIn
     public void commonSetup(FMLCommonSetupEvent event) { onInitialize(); }
     public void clientSetup(FMLClientSetupEvent event) { onInitializeClient(); }
     #endif
+
+    public static boolean isDedicatedServer() {
+        #if FABRIC
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
+        #elif NEO
+        return FMLLoader.getDist() == Dist.DEDICATED_SERVER;
+        #else
+        return FMLLoader.getDist() == Dist.DEDICATED_SERVER;
+        #endif
+    }
 }

@@ -12,12 +12,12 @@ public class AnimationUtil {
     public static AnimationKeyframe applyPose(AnimationTimeline animation, GuiGraphics context, Vector2i bgOffset, TextAnchor anchor, TextAnchor align, float objectWidth, float objectHeight) {
         var key = animation.getKeyframe();
 
-        PoseUtils.applyScale(context, key.size);
+        if (key.size != 1) PoseUtils.applyScale(context, key.size);
         applyPosition(context, anchor, align, key.size, objectWidth, objectHeight, key.posX + bgOffset.x, key.posY + bgOffset.y, key.posZ);
 
-        PoseUtils.applyYRotation(context, key.size, objectWidth, objectHeight, key.rotY);
-        PoseUtils.applyXRotation(context, key.size, objectWidth, objectHeight, key.rotX);
-        PoseUtils.applyZRotation(context, key.size, objectWidth, objectHeight, key.rotZ);
+        if (key.rotY != 0) PoseUtils.applyYRotation(context, key.size, objectWidth, objectHeight, key.rotY);
+        if (key.rotX != 0) PoseUtils.applyXRotation(context, key.size, objectWidth, objectHeight, key.rotX);
+        if (key.rotZ != 0) PoseUtils.applyZRotation(context, key.size, objectWidth, objectHeight, key.rotZ);
 
         return key;
     }

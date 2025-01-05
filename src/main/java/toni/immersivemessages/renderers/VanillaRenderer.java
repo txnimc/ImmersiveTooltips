@@ -14,7 +14,6 @@ import toni.immersivemessages.api.ImmersiveMessage;
 import toni.immersivemessages.util.AnimationUtil;
 import toni.immersivemessages.util.RenderUtil;
 import com.mojang.blaze3d.vertex.*;
-import xyz.flirora.caxton.layout.CaxtonText;
 
 import java.util.ArrayList;
 
