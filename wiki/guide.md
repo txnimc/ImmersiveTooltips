@@ -22,6 +22,7 @@ modImplementation("toni.txnilib:${loader}-${mcVersion}:${txnilibVersion}")
 // in your repositories block
 repositories {
     maven("https://maven.txni.dev/")
+    maven("https://maven.su5ed.dev/releases")
 }
 ``` 
 :::
