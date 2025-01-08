@@ -34,7 +34,7 @@ public class VanillaRenderer implements ITooltipRenderer {
 
         int yOffset = 0;
         float fade = FastColor.ARGB32.alpha(tooltip.animation.getColor()) / 255f;
-        MultiBufferSource.BufferSource renderType = MultiBufferSource.immediate(#if MC > "201" new ByteBufferBuilder(512) #else new BufferBuilder(512) #endif);
+        MultiBufferSource.BufferSource renderType = graphics.bufferSource();
 
         for (int lineNumber = 0; lineNumber < textLines.size(); ++lineNumber)
         {
@@ -65,7 +65,7 @@ public class VanillaRenderer implements ITooltipRenderer {
             yOffset += 10;
         }
 
-        renderType.endBatch();
+        graphics.flush();
     }
 
     private static Vector3i wrapText(ArrayList<FormattedText> textLines, ImmersiveMessage tooltip, boolean isCallingFromRoot) {

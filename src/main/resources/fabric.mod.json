@@ -29,8 +29,8 @@
 		"mixins.${id}.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.15.0",
 		"minecraft": "${mc}",
+		"fabricloader": ">=0.15.0",
 		"fabric-api": "*",
         "txnilib": ">=1.0.0"
 	},
