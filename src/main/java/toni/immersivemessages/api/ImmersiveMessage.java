@@ -211,7 +211,7 @@ public class ImmersiveMessage {
      */
     public static ImmersiveMessage builder(float duration, MutableComponent text) {
         ImmersiveMessage tooltip = new ImmersiveMessage();
-        tooltip.text = Component.translatable(text.toString());
+        tooltip.text = text;
         tooltip.style = Style.EMPTY;
         tooltip.animation = AnimationTimeline.builder(duration);
         tooltip.animation.withYPosition(tooltip.yLevel);
